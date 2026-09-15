@@ -1,0 +1,35 @@
+appId: com.operator.app
+productName: Operator
+copyright: © 2026 Arun
+
+directories:
+  output: dist
+
+# The Electron app itself is just the shell. The Next.js standalone server
+# ships as a tarball (electron-builder's file matcher force-excludes
+# node_modules, so a plain directory copy won't work) and is extracted to
+# the user-data directory on first run / upgrade.
+files:
+  - electron/**/*
+  - package.json
+
+extraResources:
+  - from: desktop-server.tar.gz
+    to: server.tar.gz
+  - from: ARUN_CONTEXT.md
+    to: ARUN_CONTEXT.md
+
+asar: true
+
+mac:
+  category: public.app-category.productivity
+  icon: build/icon.png
+  target:
+    - dmg
+  artifactName: Operator-arm64.${ext}
+
+dmg:
+  title: Operator
+  window:
+    width: 540
+    height: 380

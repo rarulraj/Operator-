@@ -1,0 +1,12 @@
+node_modules/
+.next/
+out/
+dist/
+.env
+.env.local
+.env*.local
+.data/
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+desktop-server.tar.gz
