@@ -21,7 +21,7 @@ export function LogForm() {
 
   function analyze() {
     if (text.trim().length < 10) {
-      setError("Write a bit more — what did you actually do today?");
+      setError("Write a bit more: what did you actually do today?");
       return;
     }
     setError(null);
@@ -59,7 +59,7 @@ export function LogForm() {
         setStage({ name: "saved", totalXp: res.totalXp, insight: draft.insight });
         setText("");
       } else {
-        setError("Nothing to save — add at least one XP entry.");
+        setError("Nothing to save: add at least one XP entry.");
       }
     });
   }
@@ -91,7 +91,7 @@ export function LogForm() {
             <div className="mt-3 flex items-center justify-between">
               <p className="text-[11px] text-zinc-600">
                 The coach reads this, attributes XP to skills, and tells you what to
-                focus on next. Outcomes earn — hours don&apos;t.
+                focus on next. Outcomes earn: hours don&apos;t.
               </p>
               <Button onClick={analyze} disabled={pending}>
                 {pending ? "Analyzing…" : "Analyze"}
@@ -104,7 +104,7 @@ export function LogForm() {
         {stage.name === "confirm" && (
           <div className="animate-pop-in">
             <p className="text-[13px] text-zinc-400">
-              Proposed XP — adjust anything before it goes on the ledger:
+              Proposed XP: adjust anything before it goes on the ledger:
             </p>
             <div className="mt-3 space-y-2">
               {stage.draft.entries.map((entry, i) => {
@@ -192,7 +192,7 @@ export function LogForm() {
         {stage.name === "saved" && (
           <div className="animate-pop-in py-2">
             <div className="flex items-center gap-2 text-sm font-semibold text-reef">
-              <Check size={16} /> Entry saved — +{stage.totalXp} XP on the ledger
+              <Check size={16} /> Entry saved: +{stage.totalXp} XP on the ledger
             </div>
             {stage.insight && (
               <p className="mt-3 flex gap-2.5 rounded-lg border border-ink-700/60 bg-ink-900/70 px-4 py-3 text-sm leading-relaxed text-zinc-300">

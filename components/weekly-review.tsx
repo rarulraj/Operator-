@@ -56,7 +56,7 @@ export function WeeklyReviewPanel({ reviews }: { reviews: WeeklyReview[] }) {
       <div className="px-5 pb-5 pt-2">
         {!latest && !pending && (
           <p className="py-3 text-sm text-zinc-500">
-            No reviews yet. Generate one any time — Sundays are the ritual.
+            No reviews yet. Generate one any time: Sundays are the ritual.
           </p>
         )}
         {pending && (

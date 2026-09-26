@@ -15,7 +15,7 @@ export default async function MissionsPage() {
       <div>
         <h1 className="text-xl font-semibold tracking-tight text-zinc-50">Missions</h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Larger real-world goals. Update progress honestly — completing a mission pays
+          Larger real-world goals. Update progress honestly: completing a mission pays
           out its full XP reward.
         </p>
       </div>

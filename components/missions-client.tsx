@@ -116,7 +116,7 @@ function MissionCard({ mission }: { mission: Mission }) {
         )}
         {completed && (
           <span className="text-[12px] font-medium text-reef">
-            Mission complete — +{mission.xpReward} XP earned
+            Mission complete: +{mission.xpReward} XP earned
           </span>
         )}
       </div>
@@ -126,7 +126,7 @@ function MissionCard({ mission }: { mission: Mission }) {
 
 export function MissionsClient({ missions }: { missions: Mission[] }) {
   const groups: { status: MissionStatus; label: string }[] = [
-    { status: "active", label: "Active — Boss Battles" },
+    { status: "active", label: "Active: Boss Battles" },
     { status: "not_started", label: "Not Started" },
     { status: "paused", label: "Paused" },
     { status: "completed", label: "Completed" },

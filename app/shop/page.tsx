@@ -12,8 +12,9 @@ export default async function ShopPage() {
       <div>
         <h1 className="text-xl font-semibold tracking-tight text-zinc-50">Shop</h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Pierre&apos;s, basically. Gold comes from real work — tasks, quests, journal
-          entries, missions — and buys style only. Power still comes from XP.
+          Pierre&apos;s restocked. Gold from real work buys frames, auras,
+          companions, titles, and portrait backdrops. Style only: power still
+          comes from XP.
         </p>
       </div>
       <ShopClient inventory={state.inventory} totalXp={totalXp(state)} />

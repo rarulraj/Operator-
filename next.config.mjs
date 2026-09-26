@@ -4,7 +4,7 @@ const nextConfig = {
   // Self-contained server build for the Electron desktop app
   output: "standalone",
   // pdf-parse (and its pdfjs-dist internals) must keep their real file
-  // layout at runtime — pdfjs resolves its worker file from disk.
+  // layout at runtime: pdfjs resolves its worker file from disk.
   serverExternalPackages: ["pdf-parse"],
   outputFileTracingIncludes: {
     "/**": [

@@ -116,11 +116,125 @@ body {
     filter: drop-shadow(0 0 22px rgba(242, 184, 59, 0.75));
   }
 }
+@keyframes aura-coal-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 4px rgba(180, 60, 20, 0.25));
+  }
+  50% {
+    filter: drop-shadow(0 0 14px rgba(220, 80, 30, 0.5));
+  }
+}
+@keyframes aura-river-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 4px rgba(94, 184, 224, 0.28));
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(94, 184, 224, 0.65));
+  }
+}
+@keyframes aura-meadow-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 4px rgba(127, 200, 96, 0.28));
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(127, 200, 96, 0.6));
+  }
+}
+@keyframes aura-plum-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 5px rgba(179, 137, 232, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(179, 137, 232, 0.65));
+  }
+}
+@keyframes aura-moon-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 5px rgba(200, 212, 224, 0.25));
+  }
+  50% {
+    filter: drop-shadow(0 0 16px rgba(220, 230, 240, 0.55));
+  }
+}
+@keyframes aura-static-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 3px rgba(180, 220, 255, 0.2));
+  }
+  40% {
+    filter: drop-shadow(0 0 10px rgba(180, 220, 255, 0.55));
+  }
+  55% {
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
+  }
+}
+@keyframes aura-void-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 22px rgba(139, 92, 246, 0.7));
+  }
+}
+@keyframes aura-aurora-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px rgba(242, 184, 59, 0.45));
+  }
+  33% {
+    filter: drop-shadow(0 0 16px rgba(94, 184, 224, 0.55));
+  }
+  66% {
+    filter: drop-shadow(0 0 16px rgba(127, 200, 96, 0.55));
+  }
+}
+@keyframes aura-harvest-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 5px rgba(224, 154, 43, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(242, 184, 59, 0.65));
+  }
+}
 .aura-ember {
   animation: aura-ember-pulse 2.8s ease-in-out infinite;
 }
 .aura-golden {
   animation: aura-golden-pulse 2.4s ease-in-out infinite;
+}
+.aura-coal {
+  animation: aura-coal-pulse 3s ease-in-out infinite;
+}
+.aura-river {
+  animation: aura-river-pulse 2.6s ease-in-out infinite;
+}
+.aura-meadow {
+  animation: aura-meadow-pulse 2.8s ease-in-out infinite;
+}
+.aura-plum {
+  animation: aura-plum-pulse 2.5s ease-in-out infinite;
+}
+.aura-moon {
+  animation: aura-moon-pulse 3.2s ease-in-out infinite;
+}
+.aura-static {
+  animation: aura-static-pulse 1.4s ease-in-out infinite;
+}
+.aura-voidglow {
+  animation: aura-void-pulse 2.2s ease-in-out infinite;
+}
+.aura-aurora {
+  animation: aura-aurora-pulse 4s ease-in-out infinite;
+}
+.aura-harvest {
+  animation: aura-harvest-pulse 2.6s ease-in-out infinite;
 }
 
 /* Idle mode scene */
@@ -182,7 +296,16 @@ body {
   .animate-sprite-idle,
   .sprite-glow,
   .aura-ember,
-  .aura-golden {
+  .aura-golden,
+  .aura-coal,
+  .aura-river,
+  .aura-meadow,
+  .aura-plum,
+  .aura-moon,
+  .aura-static,
+  .aura-voidglow,
+  .aura-aurora,
+  .aura-harvest {
     animation: none;
   }
 }
@@ -190,4 +313,150 @@ body {
 /* Number tabular for XP readouts */
 .tnum {
   font-variant-numeric: tabular-nums;
+}
+
+/* ── Apple Notes surface (Operator dark) ─────────────────────────────────── */
+.apple-notes-shell {
+  position: fixed;
+  z-index: 25;
+  inset: 0;
+  top: 3.75rem;
+  background: #161009;
+  color-scheme: dark;
+}
+@media (min-width: 768px) {
+  .apple-notes-shell {
+    top: 0;
+    left: 15rem;
+  }
+}
+.apple-notes-shell .apple-notes {
+  height: 100%;
+  width: 100%;
+}
+
+.apple-notes {
+  color: #f4f0e8;
+  color-scheme: dark;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+    var(--font-inter), "Helvetica Neue", sans-serif;
+  background: #161009;
+}
+.apple-notes ::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+.apple-notes ::-webkit-scrollbar-thumb {
+  background: #41321f;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.apple-notes ::-webkit-scrollbar-thumb:hover {
+  background: #5a4630;
+  background-clip: padding-box;
+}
+.apple-notes * {
+  box-sizing: border-box;
+}
+.apple-notes .an-sidebar {
+  background: #1e160d;
+  color: #f4f0e8;
+}
+.apple-notes .an-list {
+  background: #1a120b;
+}
+.apple-notes .an-editor {
+  background: #161009;
+}
+.apple-notes .an-row-selected .an-row-inner {
+  background: rgba(242, 184, 59, 0.22);
+  border-radius: 8px;
+}
+.apple-notes .an-row:hover:not(.an-row-selected) .an-row-inner {
+  background: #271d12;
+  border-radius: 8px;
+}
+.apple-notes .an-body {
+  outline: none;
+  color: #f4f0e8;
+  font-size: 17px;
+  line-height: 1.47;
+  min-height: 12rem;
+  caret-color: #f2b83b;
+}
+.apple-notes .an-body:empty:before {
+  content: attr(data-placeholder);
+  color: #6b5a45;
+  pointer-events: none;
+}
+.apple-notes .an-body h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.4em;
+  color: #faf6ee;
+}
+.apple-notes .an-body h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0.8em 0 0.3em;
+}
+.apple-notes .an-body p {
+  margin: 0 0 0.4em;
+}
+.apple-notes .an-body ul,
+.apple-notes .an-body ol {
+  margin: 0.3em 0 0.6em;
+  padding-left: 1.4em;
+}
+.apple-notes .an-checks {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.4em 0 0.8em;
+}
+.apple-notes .an-checks .an-item {
+  position: relative;
+  padding: 3px 0 3px 28px;
+  min-height: 24px;
+}
+.apple-notes .an-checks .an-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 5px;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid #5a4630;
+  border-radius: 50%;
+  background: #1e160d;
+}
+.apple-notes .an-checks .an-item[data-checked="true"] {
+  color: #8a7a66;
+  text-decoration: line-through;
+}
+.apple-notes .an-checks .an-item[data-checked="true"]::before {
+  border-color: #f2b83b;
+  background: #f2b83b
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='%23161009' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' d='M3.5 8.5 L6.5 11.5 L12.5 4.5'/></svg>")
+    center/12px no-repeat;
+}
+.apple-notes .an-body img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 0.5em 0;
+}
+.apple-notes .an-body a {
+  color: #f2b83b;
+}
+.apple-notes .an-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.6em 0 1em;
+}
+.apple-notes .an-table td {
+  border: 1px solid #41321f;
+  padding: 8px 10px;
+  min-width: 7rem;
+  vertical-align: top;
 }

@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Stardew-inspired cozy dark palette — soil browns, warm gold, leaf green
+        // Stardew-inspired cozy dark palette: soil browns, warm gold, leaf green
         ink: {
           950: "#161009",
           900: "#1e160d",

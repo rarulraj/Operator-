@@ -1,7 +1,9 @@
 import { CATEGORY_MAP, emptyCategoryTotals } from "../skills";
+import { todoNotes } from "../todos";
 import { levelFromXp } from "../xp";
 import type { AppState, CategoryId } from "../types";
 import { coachSystemPrompt, getOpenAI, openAiModel } from "./openai";
+import { loadSituation, type Situation } from "./situation";
 
 // ── AI Coach ────────────────────────────────────────────────────────────────
 // Produces 1-3 sharp recommendations from current state.
@@ -30,9 +32,17 @@ function skillXpIn(events: { skillId: string | null; amount: number }[]) {
   return totals;
 }
 
-function ruleBasedCoach(state: AppState): string[] {
+function ruleBasedCoach(state: AppState, situation?: Situation): string[] {
   const recs: string[] = [];
-  const last7 = recentEvents(state, 7);
+  if (situation?.mode === "conference") {
+    recs.push(
+      "You are at the conference. One real booth conversation (name, company, why they stopped) and a LinkedIn extract from the floor beat any desk work you invented this morning.",
+    );
+  } else if (situation?.mode === "travel") {
+    recs.push(
+      "You are on the road. Protect one real conversation and one written follow-up. Do not build a full home-office day from here.",
+    );
+  }
   const last14 = recentEvents(state, 14);
   const catTotals = categoryXpIn(last14);
   const skillTotals = skillXpIn(last14);
@@ -45,12 +55,12 @@ function ruleBasedCoach(state: AppState): string[] {
     if (max[0] === "ai_gtm" && min[0] !== "ai_gtm") {
       recs.push(
         min[0] === "tfe"
-          ? "Your AI GTM XP is compounding while TFE sits idle. Turn one lesson from this week's AI work into a short post — distribution debt is the hardest to pay down later."
+          ? "Your AI GTM XP is compounding while TFE sits idle. Turn one lesson from this week's AI work into a short post: distribution debt is the hardest to pay down later."
           : "Your AI GTM work is outpacing Reefly. Point one discovery or architecture exercise this week at your own product.",
       );
     } else if (max[0] === "reefly" && min[0] === "tfe") {
       recs.push(
-        "Reefly is getting all the reps and TFE none. Your publishing streak is slipping — turn one lesson from this week's product work into a short post.",
+        "Reefly is getting all the reps and TFE none. Your publishing streak is slipping: turn one lesson from this week's product work into a short post.",
       );
     } else {
       recs.push(
@@ -80,7 +90,7 @@ function ruleBasedCoach(state: AppState): string[] {
   // 4. Personal brand / LinkedIn gap
   if ((catTotals.brand ?? 0) < 25 && recs.length < 3) {
     recs.push(
-      "Personal brand is quiet. 10,000 LinkedIn followers will not happen from lurk-mode — post one specific story from a TDengine or customer moment this week.",
+      "Personal brand is quiet. 10,000 LinkedIn followers will not happen from lurk-mode: post one specific story from a TDengine or customer moment this week.",
     );
   }
 
@@ -88,7 +98,7 @@ function ruleBasedCoach(state: AppState): string[] {
   const writingXp = skillTotals.get("writing") ?? 0;
   if (writingXp === 0 && catTotals.tfe < 50 && recs.length < 3) {
     recs.push(
-      "TFE is idle. If you already posted on LinkedIn, fine — if not, turn one real work moment into a short note for founders.",
+      "TFE is idle. If you already posted on LinkedIn, fine: if not, turn one real work moment into a short note for founders.",
     );
   }
 
@@ -115,7 +125,10 @@ function ruleBasedCoach(state: AppState): string[] {
   return recs.slice(0, 3);
 }
 
-async function openAiCoach(state: AppState): Promise<string[] | null> {
+async function openAiCoach(
+  state: AppState,
+  situation?: Situation,
+): Promise<string[] | null> {
   const openai = getOpenAI();
   if (!openai) return null;
 
@@ -131,12 +144,23 @@ async function openAiCoach(state: AppState): Promise<string[] | null> {
     .map((s) => `${s.name} (${s.xp} XP)`);
   const activeMissions = state.missions
     .filter((m) => m.status === "active")
-    .map((m) => `${m.title} — ${m.progress}%`)
+    .map((m) => `${m.title}: ${m.progress}%`)
     .join("; ");
   const recentLogs = state.activityLogs
     .slice(-4)
     .map((l) => l.rawText.slice(0, 140))
     .join(" | ");
+  const openTasks = state.todos
+    .filter((t) => !t.completed)
+    .slice(0, 10)
+    .map((t) => {
+      const bits = [t.title];
+      if (t.pinned) bits.push("pinned");
+      const notes = todoNotes(t);
+      if (notes) bits.push(`note: ${notes.slice(0, 120)}`);
+      return bits.join(": ");
+    })
+    .join("\n");
 
   try {
     const res = await openai.chat.completions.create({
@@ -154,10 +178,14 @@ Strongest skills: ${topSkills.join(", ")}
 Weakest skills: ${weakSkills.join(", ")}
 Streak: ${state.streak.current} days
 Active missions: ${activeMissions || "none"}
+Open tasks (working notes matter):
+${openTasks || "none"}
 Recent activity logs: ${recentLogs || "none"}
 Campaign position: Week ${state.campaign.currentWeek}, Day ${state.campaign.currentDay}
+Live situation (obey this over a normal weekday script):
+${situation?.text || "none captured"}
 
-Rules: each recommendation 1-2 sentences, specific, references his actual data, names the gap and the move. No motivation, no fluff.
+Rules: each recommendation 1-2 sentences, specific, references his actual data, names the gap and the move. No motivation, no fluff. If he is at a conference or on the road, coach that day.
 
 Return JSON: { "recommendations": string[] }`,
         },
@@ -178,9 +206,10 @@ export async function coachRecommendations(
   state: AppState,
   opts?: { allowAi?: boolean },
 ): Promise<string[]> {
+  const situation = await loadSituation(state);
   if (opts?.allowAi !== false) {
-    const ai = await openAiCoach(state);
+    const ai = await openAiCoach(state, situation);
     if (ai) return ai;
   }
-  return ruleBasedCoach(state);
+  return ruleBasedCoach(state, situation);
 }

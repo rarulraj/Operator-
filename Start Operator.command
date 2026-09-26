@@ -4,7 +4,7 @@
 # It installs deps if needed, builds once, then serves the production app
 # and opens it in your default browser.
 #
-# Optional: install it to your Dock like a real app —
+# Optional: install it to your Dock like a real app :
 #   1. Start this script
 # 2. In Chrome: ⋮ menu → Cast, save, and share → Install page as app…
 #      (uses the built-in PWA manifest + icon)

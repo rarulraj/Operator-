@@ -1,6 +1,6 @@
 import type { CurriculumWeek } from "./types";
 
-// ── AI × Sales × Founder — Season 1 ─────────────────────────────────────────
+// ── AI × Sales × Founder: Season 1 ─────────────────────────────────────────
 // 12 weeks. Each week is a chapter; each day has a lesson + a real deliverable.
 // Completing a day's quest advances the campaign cursor.
 // Structure follows ARUN_CONTEXT.md exactly.
@@ -82,7 +82,7 @@ export const CURRICULUM: CurriculumWeek[] = [
         day: 1,
         title: "Score & Rank AI Opportunities",
         lesson:
-          "Not every workflow deserves AI. Build a scoring rubric — data readiness, pain severity, executive sponsorship, pilot feasibility — and rank what you've found.",
+          "Not every workflow deserves AI. Build a scoring rubric: data readiness, pain severity, executive sponsorship, pilot feasibility: and rank what you've found.",
         deliverable: "Opportunity Scorecard #001",
         category: "ai_gtm",
         skillIds: ["discovery", "roi_business_cases"],
@@ -109,7 +109,7 @@ export const CURRICULUM: CurriculumWeek[] = [
         day: 4,
         title: "Discovery on Your Own Product",
         lesson:
-          "Point the discovery lens inward. Map the Reefly user workflow your product intervenes in — trigger, information, reasoning, decision, action, outcome.",
+          "Point the discovery lens inward. Map the Reefly user workflow your product intervenes in: trigger, information, reasoning, decision, action, outcome.",
         deliverable: "Reefly Workflow Map #001",
         category: "reefly",
         skillIds: ["customer_discovery", "product"],
@@ -143,7 +143,7 @@ export const CURRICULUM: CurriculumWeek[] = [
         day: 2,
         title: "Model Selection Without Benchmark Chasing",
         lesson:
-          "Frontier API vs. open weights vs. small fine-tuned model — the choice is data gravity, latency, cost, and eval results on YOUR task. Build a decision frame you can defend to a CIO.",
+          "Frontier API vs. open weights vs. small fine-tuned model: the choice is data gravity, latency, cost, and eval results on YOUR task. Build a decision frame you can defend to a CIO.",
         deliverable: "Model Selection Memo #001",
         category: "ai_gtm",
         skillIds: ["ai_architecture", "executive_selling"],
@@ -180,7 +180,7 @@ export const CURRICULUM: CurriculumWeek[] = [
   {
     week: 4,
     title: "Agents, RAG & Tool Use",
-    theme: "When a workflow needs an agent — and when it absolutely doesn't.",
+    theme: "When a workflow needs an agent: and when it absolutely doesn't.",
     days: [
       {
         day: 1,
@@ -204,7 +204,7 @@ export const CURRICULUM: CurriculumWeek[] = [
         day: 3,
         title: "Permissions-Aware Retrieval",
         lesson:
-          "Enterprise RAG must respect document-level ACLs. Learn the patterns for trimming retrieval by user permissions — the first question every security team asks.",
+          "Enterprise RAG must respect document-level ACLs. Learn the patterns for trimming retrieval by user permissions: the first question every security team asks.",
         deliverable: "Permissions Model #001",
         category: "ai_gtm",
         skillIds: ["rag", "security"],
@@ -222,7 +222,7 @@ export const CURRICULUM: CurriculumWeek[] = [
         day: 5,
         title: "Demo the Agent & Harvest Objections",
         lesson:
-          "Show a working prototype to a real stakeholder. The goal is not to impress — it's to collect every objection about trust, control, and accuracy.",
+          "Show a working prototype to a real stakeholder. The goal is not to impress: it's to collect every objection about trust, control, and accuracy.",
         deliverable: "Objection Log #001",
         category: "ai_gtm",
         skillIds: ["agents", "executive_selling"],
@@ -299,7 +299,7 @@ export const CURRICULUM: CurriculumWeek[] = [
         day: 2,
         title: "Scope the Smallest Real POC",
         lesson:
-          "Cut scope until the POC runs in weeks, not quarters — while still touching real data and real users. A POC without written success criteria is a slow no.",
+          "Cut scope until the POC runs in weeks, not quarters: while still touching real data and real users. A POC without written success criteria is a slow no.",
         deliverable: "POC Scope Doc #001",
         category: "ai_gtm",
         skillIds: ["pocs", "ai_architecture"],
@@ -308,7 +308,7 @@ export const CURRICULUM: CurriculumWeek[] = [
         day: 3,
         title: "Production Readiness Checklist",
         lesson:
-          "Monitoring, fallbacks, drift, ownership, SLAs, failure handling, rollback. Your expertise must not end when the demo works — build the checklist that separates demos from deployments.",
+          "Monitoring, fallbacks, drift, ownership, SLAs, failure handling, rollback. Your expertise must not end when the demo works: build the checklist that separates demos from deployments.",
         deliverable: "Production Checklist #001",
         category: "ai_gtm",
         skillIds: ["implementation"],
@@ -336,13 +336,13 @@ export const CURRICULUM: CurriculumWeek[] = [
   {
     week: 7,
     title: "Enterprise AI Selling & Executive Communication",
-    theme: "Explain complicated technology simply — to nine different audiences.",
+    theme: "Explain complicated technology simply: to nine different audiences.",
     days: [
       {
         day: 1,
         title: "The Three-Minute Business Value Story",
         lesson:
-          "Problem, cost, intervention, payoff — no architecture diagrams. Deliver it out loud until it sounds inevitable.",
+          "Problem, cost, intervention, payoff: no architecture diagrams. Deliver it out loud until it sounds inevitable.",
         deliverable: "Value Story Script #001",
         category: "ai_gtm",
         skillIds: ["executive_selling", "executive_communication"],
@@ -446,7 +446,7 @@ export const CURRICULUM: CurriculumWeek[] = [
         day: 1,
         title: "Define Your Public Thesis",
         lesson:
-          "One sentence: what do you understand that most people don't? Draft the thesis your reputation compounds around — how companies actually buy, implement, and create value from AI.",
+          "One sentence: what do you understand that most people don't? Draft the thesis your reputation compounds around: how companies actually buy, implement, and create value from AI.",
         deliverable: "Public Thesis #001",
         category: "tfe",
         skillIds: ["storytelling", "writing"],
@@ -559,7 +559,7 @@ export const CURRICULUM: CurriculumWeek[] = [
         day: 2,
         title: "Design the Referral Mechanic",
         lesson:
-          "Reef keeping is inherently social — people show off their tanks. Design the mechanic that makes inviting friends natural.",
+          "Reef keeping is inherently social: people show off their tanks. Design the mechanic that makes inviting friends natural.",
         deliverable: "Referral Design #001",
         category: "reefly",
         skillIds: ["growth", "product"],
@@ -577,7 +577,7 @@ export const CURRICULUM: CurriculumWeek[] = [
         day: 4,
         title: "Sign One Store or Partner",
         lesson:
-          "Local fish stores are distribution. Pitch one store on a partnership — their customers are exactly your users.",
+          "Local fish stores are distribution. Pitch one store on a partnership: their customers are exactly your users.",
         deliverable: "Store Partnership Pitch #001",
         category: "reefly",
         skillIds: ["partnerships", "sales"],
@@ -671,7 +671,7 @@ export function nextCampaignCursor(
 ): { week: number; day: number } {
   const w = weeks.find((c) => c.week === week);
   if (w && day < w.days.length) return { week, day: day + 1 };
-  // Roll into the next week — if it doesn't exist yet, the quest engine
+  // Roll into the next week: if it doesn't exist yet, the quest engine
   // generates it on demand (self-learning campaign).
   return { week: week + 1, day: 1 };
 }

@@ -25,6 +25,7 @@ import type {
   WeeklyReview,
   XpEvent,
 } from "../types";
+import { migrateNote, isTrashExpired } from "../notes";
 import { dateKey, type Store } from "./types";
 
 // Data lives in .data/ for `next dev`, or in the OS app-data dir when running
@@ -70,7 +71,13 @@ export class LocalStore implements Store {
 
   private applyMigrations(state: AppState): AppState {
     if (!Array.isArray(state.todos)) state.todos = [];
+    for (const todo of state.todos) {
+      if (todo.notes === undefined) todo.notes = "";
+      if (todo.pinned === undefined) todo.pinned = false;
+    }
     if (!Array.isArray(state.notes)) state.notes = [];
+    if (!Array.isArray(state.noteFolders)) state.noteFolders = [];
+    state.notes = state.notes.map(migrateNote).filter((n) => !isTrashExpired(n));
     if (!Array.isArray(state.chat)) state.chat = [];
     if (!Array.isArray(state.contextNotes)) state.contextNotes = [];
     if (!Array.isArray(state.customWeeks)) state.customWeeks = [];
@@ -139,7 +146,7 @@ export class LocalStore implements Store {
 
   private async readUnlocked(): Promise<AppState> {
     // Clean up orphaned tmp files from a previous mid-write kill. Only our
-    // own, or ones old enough that no live write could still own them —
+    // own, or ones old enough that no live write could still own them :
     // deleting another process's tmp file breaks its rename.
     try {
       const mine = `store.json.tmp-${process.pid}`;
@@ -171,7 +178,7 @@ export class LocalStore implements Store {
       return state;
     }
 
-    // Genuine first run (nothing on disk) or unrecoverable — seed a clean
+    // Genuine first run (nothing on disk) or unrecoverable: seed a clean
     // slate. Sample/demo data is only created via an explicit Settings reset.
     const seed = buildSeedState(false);
     await this.write(seed);
@@ -203,7 +210,7 @@ export class LocalStore implements Store {
           !parsed.skills?.some((s) => s.id === "linkedin_presence");
         const state = this.applyMigrations(parsed);
         if (dirty || file !== DATA_FILE) {
-          // Recovered from a fallback — restore it as the main file.
+          // Recovered from a fallback: restore it as the main file.
           if (file !== DATA_FILE) {
             console.warn(`[store] recovered state from ${path.basename(file)}`);
           }
@@ -220,7 +227,7 @@ export class LocalStore implements Store {
         }
       }
     }
-    // Nothing readable (corrupt) or nothing at all (first run) — caller seeds
+    // Nothing readable (corrupt) or nothing at all (first run): caller seeds
     return null;
   }
 
@@ -228,7 +235,7 @@ export class LocalStore implements Store {
     try {
       await this.writeUnsafe(state);
     } catch (err) {
-      // Never leave a never-persisted state in the cache — the next read
+      // Never leave a never-persisted state in the cache: the next read
       // would serve it and the UI would report a save that didn't happen.
       this.cached = null;
       this.cachedStamp = null;
@@ -409,6 +416,16 @@ export class LocalStore implements Store {
     return this.enqueue(async () => {
       const state = await this.readUnlocked();
       state.notes.push(note);
+      await this.write(state);
+    });
+  }
+
+  async updateNote(id: string, patch: Partial<NoteItem>): Promise<void> {
+    return this.enqueue(async () => {
+      const state = await this.readUnlocked();
+      const idx = state.notes.findIndex((n) => n.id === id);
+      if (idx < 0) return;
+      state.notes[idx] = { ...state.notes[idx], ...patch };
       await this.write(state);
     });
   }

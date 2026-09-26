@@ -1,8 +1,13 @@
 import { CheckCircle2, Database, FileText } from "lucide-react";
+import path from "path";
+import { AccessCard } from "@/components/access-card";
 import { ApiKeySettings } from "@/components/api-key-settings";
 import { SettingsClient } from "@/components/settings-client";
+import { SituationSettings } from "@/components/situation-settings";
 import { Badge, Card, CardHeader } from "@/components/ui";
-import { getOpenAiKeySource, maskedKey } from "@/lib/config";
+import { accessUrls } from "@/lib/access";
+import { loadSituation } from "@/lib/ai/situation";
+import { getManualSituation, getOpenAiKeySource, maskedKey } from "@/lib/config";
 import { allWeeks } from "@/lib/curriculum";
 import { getStore } from "@/lib/store";
 import { RANKS } from "@/lib/xp";
@@ -14,15 +19,27 @@ export default async function SettingsPage() {
   const keySource = getOpenAiKeySource();
   const weeks = allWeeks(state.customWeeks);
   const currentSeason = Math.ceil(state.campaign.currentWeek / 12);
+  const urls = accessUrls();
+  const manual = getManualSituation();
+  const live = await loadSituation(state);
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-semibold tracking-tight text-zinc-50">Settings</h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Single-player by design. Your data never leaves this machine.
+          Single-player by design. Data stays on this Mac; open the same board
+          from any browser while Operator is running.
         </p>
       </div>
+
+      <SituationSettings
+        initial={manual.text}
+        updatedAt={manual.at}
+        agentPreview={live.text}
+      />
+
+      <AccessCard local={urls.local} lan={urls.lan} />
 
       {/* Status */}
       <Card className="animate-fade-up">
@@ -31,7 +48,7 @@ export default async function SettingsPage() {
           <div className="flex items-center justify-between">
             <span className="text-zinc-400">Storage</span>
             <Badge className="text-reef">
-              <CheckCircle2 size={11} /> Local JSON store — active
+              <CheckCircle2 size={11} /> Local JSON store: active
             </Badge>
           </div>
           <div className="flex items-center justify-between border-t border-ink-800 pt-2.5">
@@ -78,13 +95,15 @@ export default async function SettingsPage() {
         </div>
       </Card>
 
-      <SettingsClient />
+      <SettingsClient
+        dataDir={process.env.OPERATOR_DATA_DIR || path.join(process.cwd(), ".data")}
+      />
 
       <Card className="animate-fade-up">
         <CardHeader title="Context" icon={<FileText size={14} className="text-zinc-500" />} />
         <p className="px-5 pb-5 pt-1 text-[13px] leading-relaxed text-zinc-500">
-          The coach reads <code className="rounded bg-ink-800 px-1.5 py-0.5 font-mono text-[12px] text-zinc-300">ARUN_CONTEXT.md</code> —
-          your operating thesis — on every call. Edit that file to change how it thinks.
+          The coach reads <code className="rounded bg-ink-800 px-1.5 py-0.5 font-mono text-[12px] text-zinc-300">ARUN_CONTEXT.md</code>,
+          your operating thesis, on every call. Edit that file to change how it thinks.
           Changing facts (skills, missions, activity) come from the ledger; the thesis
           stays in the file.
         </p>

@@ -19,6 +19,7 @@ import {
 } from "@/app/actions";
 import type { ChatMessage, ContextNote } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { ChatMarkdown } from "./chat-markdown";
 import { Card, CardHeader } from "./ui";
 
 function MessageBubble({
@@ -36,10 +37,14 @@ function MessageBubble({
           "relative max-w-[80%] rounded-xl border px-3.5 py-2.5",
           isUser
             ? "border-ink-600 bg-ink-800 text-zinc-100"
-            : "border-xp/20 bg-xp/5 text-zinc-200",
+            : "border-xp/15 bg-gradient-to-b from-xp/[0.07] to-ink-900/40 text-zinc-200",
         )}
       >
-        <p className="whitespace-pre-wrap text-sm leading-relaxed">{msg.content}</p>
+        {isUser ? (
+          <p className="whitespace-pre-wrap text-sm leading-relaxed">{msg.content}</p>
+        ) : (
+          <ChatMarkdown text={msg.content} />
+        )}
         <div
           className={cn(
             "mt-1 flex items-center gap-2 text-[10px] text-zinc-600",
@@ -129,7 +134,7 @@ export function ChatClient({
             <div className="flex items-center gap-3">
               {!aiConfigured && (
                 <span className="text-[11px] text-amber-400/80">
-                  Basic mode — add an OpenAI key in Settings for full conversation
+                  Basic mode: add an OpenAI key in Settings for full conversation
                 </span>
               )}
               {chat.length > 0 && (
@@ -150,7 +155,7 @@ export function ChatClient({
         >
           {chat.length === 0 && (
             <p className="py-6 text-sm text-zinc-500">
-              No conversation yet. Start with what&apos;s on your mind — or dump context:
+              No conversation yet. Start with what&apos;s on your mind, or dump context:
               &quot;I have a POC review with Acme on Friday and my manager is
               Priya.&quot; Hover your message and hit <span className="text-xp">Remember</span>{" "}
               to make it permanent context.
@@ -206,7 +211,7 @@ export function ChatClient({
         />
         <div className="flex-1 px-5 pb-5 pt-2">
           <p className="mb-3 text-[12px] leading-relaxed text-zinc-500">
-            Durable facts the coach injects into every prompt — classification,
+            Durable facts the coach injects into every prompt: classification,
             insights, quests, weekly reviews, and this chat.
           </p>
           <div className="flex gap-2">

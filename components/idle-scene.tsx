@@ -9,7 +9,7 @@ import { useEffect, useMemo, useState } from "react";
 import { SHOP_ITEM_MAP } from "@/lib/shop";
 import type { Inventory } from "@/lib/types";
 import { levelFromXp, rankFromXp } from "@/lib/xp";
-import { AURA_STYLES, FRAME_STYLES, STAGE_BY_RANK } from "./character";
+import { AURA_STYLES, FRAME_STYLES, STAGE_BY_RANK, CompanionMark } from "./character";
 
 /** Deterministic PRNG so the firefly layout is stable across renders. */
 function mulberry32(seed: number) {
@@ -65,7 +65,7 @@ export function IdleScene({
   const frameClass = (frame && FRAME_STYLES[frame]) ?? "border-black/40";
   const glowClass = (aura && AURA_STYLES[aura]) ?? "sprite-glow";
 
-  // Daylight 6am–7pm; night art otherwise. Defaults to night pre-hydration.
+  // Daylight 6am to 7pm; night art otherwise. Defaults to night pre-hydration.
   const hour = now?.getHours() ?? 21;
   const isDay = hour >= 6 && hour < 19;
 
@@ -114,21 +114,17 @@ export function IdleScene({
       {/* Character standing on the path */}
       <div className="absolute bottom-[11%] left-1/2 -translate-x-1/2">
         <div className="relative flex items-end gap-2">
-          {companion?.sprite && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={companion.sprite}
-              alt={companion.name}
-              width={74}
-              height={74}
-              className="animate-sprite-idle pixelated drop-shadow-[0_6px_10px_rgba(0,0,0,0.6)]"
-              style={{ animationDelay: "0.5s" }}
+          {companion && (
+            <CompanionMark
+              item={companion}
+              size={74}
+              className="animate-sprite-idle drop-shadow-[0_6px_10px_rgba(0,0,0,0.6)]"
             />
           )}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={stage.src}
-            alt={`${name} — ${stage.stage}`}
+            alt={`${name}: ${stage.stage}`}
             width={210}
             height={210}
             className={`animate-sprite-idle ${glowClass} pixelated rounded-2xl border-2 ${frameClass} drop-shadow-[0_8px_14px_rgba(0,0,0,0.65)]`}
@@ -136,7 +132,7 @@ export function IdleScene({
         </div>
       </div>
 
-      {/* Clock — the screensaver's main readout */}
+      {/* Clock: the screensaver's main readout */}
       <div className="absolute left-1/2 top-[9%] -translate-x-1/2 text-center">
         <div
           className="tnum font-pixel text-6xl font-bold tracking-tight text-amber-50"

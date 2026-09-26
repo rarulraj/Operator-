@@ -12,8 +12,8 @@ export default async function ChatPage() {
       <div>
         <h1 className="text-xl font-semibold tracking-tight text-zinc-50">AI Chat</h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Talk to your coach. Tell it about your life — people, plans, constraints,
-          numbers — and save the durable facts as context. Everything saved here feeds
+          Talk to your coach. Tell it about your life: people, plans, constraints,
+          numbers. Save the durable facts as context. Everything saved here feeds
           every insight, classification, quest, and weekly review.
         </p>
       </div>

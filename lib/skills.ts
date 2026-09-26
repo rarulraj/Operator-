@@ -28,7 +28,7 @@ export const CATEGORIES: CategoryMeta[] = [
     id: "tfe",
     name: "TFE / Brand & Network",
     shortName: "TFE",
-    description: "The Founders Experience — audience, network, distribution.",
+    description: "The Founders Experience: audience, network, distribution.",
     color: "#a78bfa",
     tailwind: "text-tfe",
     bg: "bg-tfe/10",
@@ -48,7 +48,7 @@ export const CATEGORIES: CategoryMeta[] = [
     id: "work",
     name: "TDengine (Work)",
     shortName: "Work",
-    description: "Solutions Engineering at TDengine — the day job.",
+    description: "Solutions Engineering at TDengine: the day job.",
     color: "#fb923c",
     tailwind: "text-orange-400",
     bg: "bg-orange-400/10",
@@ -58,7 +58,7 @@ export const CATEGORIES: CategoryMeta[] = [
     id: "physical",
     name: "Physical",
     shortName: "Physical",
-    description: "Training, nutrition, recovery — the body.",
+    description: "Training, nutrition, recovery: the body.",
     color: "#fb7185",
     tailwind: "text-rose-400",
     bg: "bg-rose-400/10",
@@ -78,7 +78,7 @@ export const CATEGORIES: CategoryMeta[] = [
     id: "wealth",
     name: "Wealth",
     shortName: "Wealth",
-    description: "Net worth, investing, income, ownership — the $20M road.",
+    description: "Net worth, investing, income, ownership: the $20M road.",
     color: "#facc15",
     tailwind: "text-yellow-400",
     bg: "bg-yellow-400/10",
@@ -88,7 +88,7 @@ export const CATEGORIES: CategoryMeta[] = [
     id: "brand",
     name: "Personal Brand",
     shortName: "Brand",
-    description: "LinkedIn, writing, positioning — become known for AI that ships.",
+    description: "LinkedIn, writing, positioning: become known for AI that ships.",
     color: "#e879f9",
     tailwind: "text-fuchsia-400",
     bg: "bg-fuchsia-400/10",
@@ -108,7 +108,7 @@ export function badgeMeta(
   return CATEGORY_MAP[category];
 }
 
-/** id, name, category — XP is stored in the DB, definitions live here. */
+/** id, name, category: XP is stored in the DB, definitions live here. */
 export const SKILL_DEFS: { id: string; name: string; category: CategoryId }[] = [
   // AI GTM / Implementation
   { id: "discovery", name: "Discovery", category: "ai_gtm" },
@@ -173,7 +173,7 @@ export const SKILL_DEFS: { id: string; name: string; category: CategoryId }[] = 
 export const SKILL_DEF_MAP: Record<string, (typeof SKILL_DEFS)[number]> =
   Object.fromEntries(SKILL_DEFS.map((s) => [s.id, s]));
 
-/** Zeroed totals for every pillar — use instead of hardcoded literals so new
+/** Zeroed totals for every pillar: use instead of hardcoded literals so new
  *  categories never break call sites. */
 export function emptyCategoryTotals(): Record<CategoryId, number> {
   return Object.fromEntries(CATEGORIES.map((c) => [c.id, 0])) as Record<
@@ -192,7 +192,7 @@ export function categoryXp(category: CategoryId, skills: Skill[]): number {
     .reduce((sum, s) => sum + s.xp, 0);
 }
 
-/** First skill in a pillar — used so category-only XP (tasks, missions)
+/** First skill in a pillar: used so category-only XP (tasks, missions)
  *  still lands on the skill tree instead of vanishing. */
 export function defaultSkillForCategory(category: CategoryId): string | null {
   return SKILL_DEFS.find((s) => s.category === category)?.id ?? null;

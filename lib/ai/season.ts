@@ -60,19 +60,19 @@ const DAY_PATTERN: {
   {
     title: (s) => `${s}: Sharpen the Mental Model`,
     lesson: (s, ctx) =>
-      `Study the core frameworks of ${s.toLowerCase()} — but with a target: ${ctx}. One hour of learning, then write down how it applies to that real situation.`,
+      `Study the core frameworks of ${s.toLowerCase()}: but with a target: ${ctx}. One hour of learning, then write down how it applies to that real situation.`,
     deliverable: (s) => `${s} Framework Notes #001`,
   },
   {
     title: (s) => `${s}: Build the Artifact`,
     lesson: (s, ctx) =>
-      `Turn study into a real artifact for ${ctx}. Templates, checklists, and maps count — something you could hand to someone else.`,
+      `Turn study into a real artifact for ${ctx}. Templates, checklists, and maps count: something you could hand to someone else.`,
     deliverable: (s) => `${s} Artifact #001`,
   },
   {
     title: (s) => `${s}: Apply It With Real People`,
     lesson: (s, ctx) =>
-      `Use the artifact in a live situation — a customer call, a user conversation, a real post. ${ctx} is the testing ground. Log what actually happened, not what you hoped.`,
+      `Use the artifact in a live situation: a customer call, a user conversation, a real post. ${ctx} is the testing ground. Log what actually happened, not what you hoped.`,
     deliverable: (s) => `${s} Field Notes #001`,
   },
   {
@@ -96,7 +96,7 @@ const CATEGORY_CONTEXT: Record<CategoryId, string> = {
   work: "your TDengine solutions engineering work and promotion case",
   physical: "your training, nutrition, and physique goals",
   social: "your friendships, family, and community",
-  wealth: "your net worth trajectory toward $20M — investing, income, ownership",
+  wealth: "your net worth trajectory toward $20M: investing, income, ownership",
   brand: "your personal brand and the 10,000 LinkedIn followers goal",
 };
 
@@ -144,7 +144,7 @@ function ruleBasedWeek(state: AppState, weekNumber: number): CurriculumWeek {
   return {
     week: weekNumber,
     title: `Focus: ${weakest.name} & Co.`,
-    theme: `Generated from your data — weakest skill: ${weakest.name} (Lv ${weakest.level}), plus ${focus
+    theme: `Generated from your data: weakest skill: ${weakest.name} (Lv ${weakest.level}), plus ${focus
       .slice(1, 3)
       .map((f) => f.name)
       .join(", ")}. Learn → build → apply → ship → systematize.`,

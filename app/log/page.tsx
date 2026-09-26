@@ -27,7 +27,7 @@ export default async function LogPage() {
           Activity Log
         </h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Your daily journal. Write what you actually did — the coach attributes XP,
+          Your daily journal. Write what you actually did: the coach attributes XP,
           spots the pattern, and tells you what to do next.
         </p>
       </div>

@@ -18,7 +18,7 @@ export interface LevelInfo {
   floor: number;
   /** Absolute XP threshold where the next level starts. */
   ceiling: number;
-  /** 0–1 progress through the current level. */
+  /** 0 to 1 progress through the current level. */
   progress: number;
 }
 
@@ -89,5 +89,5 @@ export function formatXp(n: number): string {
   return n.toLocaleString("en-US");
 }
 
-/** Small execution reward for completing a task — outcomes still rule. */
+/** Small execution reward for completing a task: outcomes still rule. */
 export const TASK_XP = 10;

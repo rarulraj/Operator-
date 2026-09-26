@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Operator — Personal RPG",
+    name: "Operator: Personal RPG",
     short_name: "Operator",
     description:
       "A personal AI-powered RPG for career growth, brand building, and startup execution.",

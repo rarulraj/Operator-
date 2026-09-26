@@ -3,7 +3,7 @@
 // user-data directory on first run / upgrade, runs it with Electron's Node,
 // and presents it in a native window. No browser required.
 
-const { app, BrowserWindow, shell, net } = require("electron");
+const { app, BrowserWindow, Menu, shell, net } = require("electron");
 const { spawn, execFile } = require("child_process");
 const { promisify } = require("util");
 const fs = require("fs");
@@ -87,9 +87,10 @@ function startServer(serverDir, dataDir, contextFile) {
       ELECTRON_RUN_AS_NODE: "1",
       NODE_ENV: "production",
       PORT: String(PORT),
-      HOSTNAME: "127.0.0.1",
+      HOSTNAME: "0.0.0.0",
       OPERATOR_DATA_DIR: dataDir,
       OPERATOR_CONTEXT_FILE: contextFile,
+      OPERATOR_HERMES_DIR: "/Users/aruntdengine/hermes-agent/workspace",
     },
     stdio: ["ignore", "pipe", "pipe"],
   });
@@ -154,6 +155,48 @@ function waitForServer(maxAttempts = 120) {
   });
 }
 
+let serverReady = false;
+
+function showWindow() {
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.show();
+    mainWindow.focus();
+    return;
+  }
+  if (serverReady) createWindow();
+}
+
+function installMenu() {
+  const openBrowser = () => {
+    shell.openExternal(APP_URL);
+  };
+  Menu.setApplicationMenu(
+    Menu.buildFromTemplate([
+      {
+        label: "Operator",
+        submenu: [
+          { label: "Open Operator", accelerator: "CmdOrCtrl+1", click: () => showWindow() },
+          {
+            label: "Open in Browser",
+            accelerator: "CmdOrCtrl+Shift+B",
+            click: openBrowser,
+          },
+          { type: "separator" },
+          { role: "hide" },
+          { role: "hideOthers" },
+          { role: "unhide" },
+          { type: "separator" },
+          { role: "quit" },
+        ],
+      },
+      { role: "editMenu" },
+      { role: "viewMenu" },
+      { role: "windowMenu" },
+    ]),
+  );
+}
+
 function createWindow() {
   console.log("[operator] creating window");
   mainWindow = new BrowserWindow({
@@ -195,13 +238,11 @@ if (!gotLock) {
   app.quit();
 } else {
   app.on("second-instance", () => {
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore();
-      mainWindow.focus();
-    }
+    showWindow();
   });
 
   app.whenReady().then(async () => {
+    installMenu();
     const paths = resolvePaths();
     try {
       await ensureServerExtracted(paths);
@@ -217,7 +258,8 @@ if (!gotLock) {
     }
     try {
       await waitForServer();
-      console.log("[operator] server is up, creating window");
+      serverReady = true;
+      console.log("[operator] server is up on 0.0.0.0:" + PORT + " (browser + LAN)");
       createWindow();
     } catch (err) {
       console.error("[operator]", err);
@@ -229,8 +271,13 @@ if (!gotLock) {
     console.error("[operator] unhandled rejection:", err);
   });
 
+  // Keep the local server up after the window closes so phones / browsers
+  // can still hit Operator from the dock icon.
   app.on("window-all-closed", () => {
-    app.quit();
+    if (process.platform !== "darwin") app.quit();
+  });
+  app.on("activate", () => {
+    showWindow();
   });
 
   // Graceful shutdown: give the server a moment to finish any in-flight

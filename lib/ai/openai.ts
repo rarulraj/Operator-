@@ -3,6 +3,7 @@ import path from "path";
 import OpenAI from "openai";
 import { getOpenAiKey } from "../config";
 import type { ContextNote } from "../types";
+import { loadSituation, situationPromptBlock } from "./situation";
 
 let client: OpenAI | null = null;
 let clientKey: string | null = null;
@@ -76,12 +77,15 @@ ${lines.join("\n")}`;
 export async function coachSystemPrompt(
   contextNotes?: ContextNote[],
 ): Promise<string> {
-  const context = await getUserContext();
-  return `You are the AI coach inside "Operator", Arun's personal RPG. Pillars: TDengine SE work (promotion), personal brand (10,000 LinkedIn followers), enterprise AI GTM, TFE, Reefly, physical (shredded + 225 bench), social, and wealth ($20M). Discovery-question homework is not the job — coach real work, visible brand, and outcomes.
+  const [context, situation] = await Promise.all([
+    getUserContext(),
+    loadSituation(),
+  ]);
+  return `You are the AI coach inside "Operator", Arun's personal RPG. Pillars: TDengine SE work (promotion), personal brand (10,000 LinkedIn followers), enterprise AI GTM, TFE, Reefly, physical (shredded + 225 bench), social, and wealth ($20M). Discovery-question homework is not the job: coach real work, visible brand, and outcomes.
 
-Below is Arun's personal operating thesis. It is stable context about who he is trying to become — treat it as ground truth and coach against it. The user message will contain the changing facts (skill levels, recent activity, missions, streaks).
+Below is Arun's personal operating thesis. It is stable context about who he is trying to become: treat it as ground truth and coach against it. The user message will contain the changing facts (skill levels, recent activity, missions, streaks).
 
-${context}${livingContextBlock(contextNotes)}
+${context}${livingContextBlock(contextNotes)}${situationPromptBlock(situation)}
 
 ---
 Your voice: a combination of experienced AI Field CTO, excellent Solutions Engineering leader, startup advisor, GTM strategist, and demanding mentor.
@@ -93,5 +97,5 @@ Your voice: a combination of experienced AI Field CTO, excellent Solutions Engin
 - If he is getting technically strong but commercially weak, say so.
 - If he does customer work without extracting lessons, say so.
 - The goal is not to maximize his XP. The goal is to make him better.
-Keep everything concise — short paragraphs, concrete recommendations.`;
+Keep everything concise: short paragraphs, concrete recommendations.`;
 }

@@ -5,7 +5,7 @@ import { useTransition } from "react";
 import { resetDataAction } from "@/app/actions";
 import { Button, Card, CardHeader } from "./ui";
 
-export function SettingsClient() {
+export function SettingsClient({ dataDir }: { dataDir: string }) {
   const [pending, startTransition] = useTransition();
 
   function reset(withSampleData: boolean) {
@@ -21,8 +21,20 @@ export function SettingsClient() {
       <CardHeader title="Data" icon={<RotateCcw size={14} className="text-zinc-500" />} />
       <div className="space-y-3 px-5 pb-5 pt-2">
         <p className="text-sm leading-relaxed text-zinc-400">
-          Everything lives locally in <code className="rounded bg-ink-800 px-1.5 py-0.5 font-mono text-[12px] text-zinc-300">.data/store.json</code> inside
-          the project folder. Back it up by copying that file.
+          This copy keeps its save in{" "}
+          <code className="rounded bg-ink-800 px-1.5 py-0.5 font-mono text-[12px] text-zinc-300">
+            {dataDir}
+          </code>
+          . Tasks, notes, chat, and settings stay there. To move them onto another
+          machine, quit Operator and run{" "}
+          <code className="rounded bg-ink-800 px-1.5 py-0.5 font-mono text-[12px] text-zinc-300">
+            npm run storage:export
+          </code>
+          , then on the other machine{" "}
+          <code className="rounded bg-ink-800 px-1.5 py-0.5 font-mono text-[12px] text-zinc-300">
+            npm run storage:import -- ~/Desktop/operator-storage-….tar.gz
+          </code>
+          .
         </p>
         <div className="flex flex-wrap gap-2">
           <Button variant="ghost" onClick={() => reset(true)} disabled={pending}>

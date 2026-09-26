@@ -11,7 +11,10 @@
     "lint": "next lint",
     "desktop": "npm run build && electron .",
     "pack:server": "rm -rf .next/standalone/.next/static .next/standalone/public && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public && tar -czf desktop-server.tar.gz -C .next/standalone .",
-    "dist": "npm run build && npm run pack:server && electron-builder"
+    "dist": "npm run build && npm run pack:server && electron-builder",
+    "storage:status": "node scripts/move-storage.mjs status",
+    "storage:export": "node scripts/move-storage.mjs export",
+    "storage:import": "node scripts/move-storage.mjs import"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",

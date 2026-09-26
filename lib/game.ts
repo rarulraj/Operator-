@@ -1,3 +1,4 @@
+import { loadSituation, questMismatchesSituation } from "./ai/situation";
 import { buildPersonalQuest, isGenericQuest, JOURNAL_TASK } from "./daily-quest";
 import { applyXpDelta, normalizeXpEvent } from "./ledger";
 import { GOLD_REWARDS, SHOP_ITEM_MAP } from "./shop";
@@ -11,6 +12,7 @@ import type {
   TrackableCategory,
   ClassifiedActivity,
   DailyQuest,
+  TodoItem,
   XpEvent,
 } from "./types";
 
@@ -35,21 +37,24 @@ async function awardGold(amount: number): Promise<void> {
   await store.saveInventory({ ...state.inventory, gold });
 }
 
-/** Today's quest is built from Arun's board, missions, and weekday —
+/** Today's quest is built from Arun's board, missions, and weekday :
  *  not from the old discovery curriculum. Generic leftover quests are
  *  replaced in place so the day is never a worksheet. */
 export async function ensureTodayQuest(state: AppState): Promise<DailyQuest> {
   const today = dateKey(new Date());
   const store = getStore();
+  const situation = await loadSituation(state);
 
   // Fast path: a good quest already exists in the snapshot we were handed.
   const snapshot = state.quests.find((q) => q.date === today);
+  const snapshotUntouched = snapshot?.tasks.every((t) => !t.completed) ?? false;
   if (
     snapshot &&
     (snapshot.status === "completed" ||
       (!isGenericQuest(snapshot) &&
         snapshot.tasks.some((t) => t.title === JOURNAL_TASK) &&
-        snapshot.rewardXp === 80 + snapshot.tasks.length * 20))
+        snapshot.rewardXp === 80 + snapshot.tasks.length * 20 &&
+        !(snapshotUntouched && questMismatchesSituation(snapshot, situation))))
   ) {
     return snapshot;
   }
@@ -83,8 +88,13 @@ export async function ensureTodayQuest(state: AppState): Promise<DailyQuest> {
       return;
     }
 
-    if (!current || isGenericQuest(current)) {
-      const built = buildPersonalQuest(live);
+    const untouched = current?.tasks.every((t) => !t.completed) ?? false;
+    if (
+      !current ||
+      isGenericQuest(current) ||
+      (untouched && questMismatchesSituation(current, situation))
+    ) {
+      const built = buildPersonalQuest(live, new Date(), situation);
       built.date = today;
       if (current) {
         built.id = current.id;
@@ -94,7 +104,7 @@ export async function ensureTodayQuest(state: AppState): Promise<DailyQuest> {
       }
       current = built;
     } else if (!current.tasks.some((t) => t.title === JOURNAL_TASK)) {
-      // Quests built before journaling was mandatory still need the beat —
+      // Quests built before journaling was mandatory still need the beat :
       // and the reward has to grow with the extra work.
       current.tasks.push({
         id: crypto.randomUUID(),
@@ -113,7 +123,7 @@ export async function ensureTodayQuest(state: AppState): Promise<DailyQuest> {
     }
     resolved = current;
   });
-  return resolved ?? buildPersonalQuest(state);
+  return resolved ?? buildPersonalQuest(state, new Date(), situation);
 }
 
 /** Fallback for stores without mutate(). */
@@ -124,7 +134,8 @@ async function ensureTodayQuestLegacy(
   const store = getStore();
   const existing = state.quests.find((q) => q.date === today);
   if (existing && existing.status === "completed") return existing;
-  const quest = buildPersonalQuest(state);
+  const situation = await loadSituation(state);
+  const quest = buildPersonalQuest(state, new Date(), situation);
   quest.date = today;
   if (existing) quest.id = existing.id;
   await store.saveQuest(quest);
@@ -159,7 +170,7 @@ export async function toggleQuestTask(
   return updated;
 }
 
-/** Force a quest task done (not a toggle) — used by the journal, which is
+/** Force a quest task done (not a toggle): used by the journal, which is
  *  only ever marked complete by actually saving an entry. */
 export async function markQuestTaskDone(
   questId: string,
@@ -186,7 +197,7 @@ export async function markQuestTaskDone(
 }
 
 /** Edit the day's task list by hand. The generated quest is a starting
- *  point, not a contract — but journaling stays put and the reward tracks
+ *  point, not a contract: but journaling stays put and the reward tracks
  *  the amount of work. */
 async function editQuest(
   questId: string,
@@ -474,6 +485,7 @@ export async function addTodo(
   title: string,
   category: TrackableCategory,
   missionId?: string | null,
+  extras?: { notes?: string; pinned?: boolean },
 ): Promise<void> {
   const store = getStore();
   await store.addTodo({
@@ -481,10 +493,30 @@ export async function addTodo(
     title: title.trim(),
     category,
     missionId: missionId || null,
+    notes: extras?.notes?.trim() ?? "",
+    pinned: extras?.pinned ?? false,
     completed: false,
     createdAt: new Date().toISOString(),
     completedAt: null,
   });
+}
+
+export type TodoPatch = Partial<
+  Pick<TodoItem, "title" | "notes" | "pinned" | "category" | "missionId">
+>;
+
+/** Notes, pin, rename: no XP. Completing still goes through toggleTodo. */
+export async function updateTodoFields(
+  todoId: string,
+  patch: TodoPatch,
+): Promise<void> {
+  const store = getStore();
+  const next: TodoPatch = { ...patch };
+  if (typeof next.title === "string") {
+    next.title = next.title.trim();
+    if (!next.title) return;
+  }
+  await store.updateTodo(todoId, next);
 }
 
 /** Delete a task, taking its XP and gold with it. Leaving the ledger event
@@ -626,7 +658,7 @@ export async function buyItem(
 }
 
 /** Equip/unequip an owned item. One item per type (frame/aura/companion/
- *  title) can be equipped at a time — equipping one unequips the others. */
+ *  title) can be equipped at a time: equipping one unequips the others. */
 export async function equipItem(
   itemId: string,
   equip: boolean,

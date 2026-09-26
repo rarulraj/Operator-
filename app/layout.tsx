@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Silkscreen } from "next/font/google";
 import type { ReactNode } from "react";
+import { HelperDock } from "@/components/helper-dock";
 import { NavProgress } from "@/components/nav-progress";
 import { Sidebar } from "@/components/sidebar";
 import "./globals.css";
@@ -14,7 +15,7 @@ const pixel = Silkscreen({
 });
 
 export const metadata: Metadata = {
-  title: "Operator — Personal RPG",
+  title: "Operator: Personal RPG",
   description:
     "A personal AI-powered RPG for career growth, brand building, and startup execution.",
   icons: { icon: "/icon.png", apple: "/icon.png" },
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             {children}
           </div>
         </main>
+        <HelperDock />
       </body>
     </html>
   );

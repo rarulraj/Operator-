@@ -140,7 +140,7 @@ export function QuestView({
         } else {
           setOptimistic({});
           setError(
-            "Couldn't complete the quest — a task didn't save. Check the boxes again.",
+            "Couldn't complete the quest: a task didn't save. Check the boxes again.",
           );
         }
       } catch {
@@ -270,7 +270,7 @@ export function QuestView({
                           {savingJournal ? "Saving…" : "Save journal entry"}
                         </Button>
                         <span className="text-[11px] text-zinc-600">
-                          Journaling can&apos;t be ticked off — it has to be written and
+                          Journaling can&apos;t be ticked off: it has to be written and
                           saved.
                         </span>
                       </div>
@@ -318,7 +318,7 @@ export function QuestView({
                   value={newTask}
                   onChange={(e) => setNewTask(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && addTask()}
-                  placeholder="Add a task to today — what actually needs doing"
+                  placeholder="Add a task to today: what actually needs doing"
                   className="min-w-0 flex-1 rounded-lg border border-ink-700 bg-ink-900/70 px-3.5 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-ink-600 focus:outline-none"
                 />
                 <button
@@ -383,7 +383,7 @@ export function QuestView({
           <div className="px-6 py-5">
             <div className="flex items-center gap-2 text-sm font-semibold text-xp">
               <PartyPopper size={16} />
-              Quest Complete — +{result.xpAwarded} XP
+              Quest Complete: +{result.xpAwarded} XP
               {result.streak > 0 && (
                 <span className="ml-2 inline-flex items-center gap-1 text-orange-400">
                   <Flame size={14} /> {result.streak} day streak

@@ -135,21 +135,21 @@ function heuristicInsight(entries: ClassifiedActivity[], raw: string): string {
     return "You encountered a real governance objection today. This is a strong opportunity to practice turning data-access concerns into an accountability and permissions discussion.";
   }
   if (has("customer_discovery") && has("product")) {
-    return "You talked to users and shipped in the same window. That loop — hear it, build it, close the loop — is the entire retention engine. Keep the cycle time short.";
+    return "You talked to users and shipped in the same window. That loop (hear it, build it, close the loop) is the entire retention engine. Keep the cycle time short.";
   }
   if (has("discovery") && has("ai_architecture")) {
     return "Discovery and architecture in the same day means the use case is grounded in a real workflow. Next test: can you explain the business value in three minutes without a diagram?";
   }
   if (has("writing")) {
-    return "You produced content today. Distribution is the multiplier — make sure one real person reads it, not just the feed.";
+    return "You produced content today. Distribution is the multiplier: make sure one real person reads it, not just the feed.";
   }
   if (has("product")) {
     return "Product work logged. The question that matters: which user-visible metric moves because of what you shipped?";
   }
   if (has("customer_discovery", "discovery")) {
-    return "Real conversation logged. The value is in what changes because of it — write down one decision this conversation should alter.";
+    return "Real conversation logged. The value is in what changes because of it: write down one decision this conversation should alter.";
   }
-  return "Logged. The pattern to watch: are you balancing building, selling, and distribution — or hiding in the one that's most comfortable?";
+  return "Logged. The pattern to watch: are you balancing building, selling, and distribution, or hiding in the one that's most comfortable?";
 }
 
 function heuristicNextFocus(entries: ClassifiedActivity[], state: AppState): string {
@@ -203,7 +203,7 @@ function heuristicClassify(text: string, state: AppState): ClassificationResult 
     .slice(0, 4);
 
   if (!entries.length) {
-    // Nothing matched — treat as general reflection, small XP to the weakest area
+    // Nothing matched: treat as general reflection, small XP to the weakest area
     const weakest = [...state.skills].sort((a, b) => a.xp - b.xp)[0];
     entries = [
       {

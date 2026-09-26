@@ -37,13 +37,13 @@ export function promotionMission(now: Date): Mission {
  *  predate them. */
 export function physiqueMissions(now: Date): Mission[] {
   const created = now.toISOString();
-  const deadline = "2027-07-01"; // shredded by July 2027 — bench along the way
+  const deadline = "2027-07-01"; // shredded by July 2027: bench along the way
   return [
     {
       id: "mission-shredded-2027",
       title: "Get Shredded by July 2027",
       description:
-        "Lean down to a visibly shredded physique — abs, definition, the whole thing. Training and nutrition consistency every week.",
+        "Lean down to a visibly shredded physique: abs, definition, the whole thing. Training and nutrition consistency every week.",
       category: "physical",
       progress: 0,
       target: "Visibly shredded physique",
@@ -55,7 +55,7 @@ export function physiqueMissions(now: Date): Mission[] {
     {
       id: "mission-bench-225",
       title: "Bench 225",
-      description: "Build to a full 225 lb bench press — two plates a side.",
+      description: "Build to a full 225 lb bench press: two plates a side.",
       category: "physical",
       progress: 0,
       target: "1 rep at 225 lb",
@@ -74,7 +74,7 @@ export function brandMissions(now: Date): Mission[] {
       id: "mission-linkedin-10k",
       title: "Reach 10,000 LinkedIn Followers",
       description:
-        "Personal brand, not TFE volume. Get to 10k by posting from real TDengine, AI, and founder work — specific stories, not generic takes.",
+        "Personal brand, not TFE volume. Get to 10k by posting from real TDengine, AI, and founder work: specific stories, not generic takes.",
       category: "brand",
       progress: 0,
       target: "10,000 LinkedIn followers",
@@ -94,7 +94,7 @@ export function wealthMissions(now: Date): Mission[] {
       id: "mission-20m",
       title: "Build $20M Net Worth",
       description:
-        "The long game. Compound income, ownership, and investments into $20M. Every other pillar feeds this one — the ventures create the equity, the day job funds the runway.",
+        "The long game. Compound income, ownership, and investments into $20M. Every other pillar feeds this one: the ventures create the equity, the day job funds the runway.",
       category: "wealth",
       progress: 0,
       target: "$20,000,000 net worth",
@@ -246,7 +246,7 @@ function seedMissions(now: Date): Mission[] {
     {
       id: "mission-tfe-event",
       title: "Host a TFE Event",
-      description: "Host the first Founders Experience event — dinner, AMA, or small summit.",
+      description: "Host the first Founders Experience event: dinner, AMA, or small summit.",
       category: "tfe",
       progress: 0,
       target: "1 event hosted with 10+ founders",
@@ -277,7 +277,7 @@ const SAMPLE_HISTORY: SampleEntry[] = [
       { skillId: "discovery", xp: 30, note: "Completed discovery lesson" },
       { skillId: "discovery", xp: 50, note: "Drafted first workflow map" },
     ],
-    insight: "Mapping workflows before pitching is the right instinct — it turns AI from a demo into a diagnosis.",
+    insight: "Mapping workflows before pitching is the right instinct: it turns AI from a demo into a diagnosis.",
   },
   {
     daysBack: 11,
@@ -292,7 +292,7 @@ const SAMPLE_HISTORY: SampleEntry[] = [
     daysBack: 10,
     text: "Drafted a TFE post about why AI discovery beats AI demos.",
     entries: [{ skillId: "writing", xp: 50, note: "Drafted TFE post" }],
-    insight: "Drafts don't compound — shipping does. Get it published.",
+    insight: "Drafts don't compound: shipping does. Get it published.",
   },
   {
     daysBack: 9,
@@ -305,7 +305,7 @@ const SAMPLE_HISTORY: SampleEntry[] = [
   },
   {
     daysBack: 8,
-    text: "Shipped improvements to Reefly onboarding — cut setup from 6 steps to 3.",
+    text: "Shipped improvements to Reefly onboarding: cut setup from 6 steps to 3.",
     entries: [{ skillId: "product", xp: 150, note: "Shipped onboarding improvements" }],
     insight: "Onboarding is the highest-leverage surface you own. Instrument the before/after activation rate.",
   },
@@ -316,13 +316,13 @@ const SAMPLE_HISTORY: SampleEntry[] = [
       { skillId: "writing", xp: 75, note: "Published TFE post" },
       { skillId: "audience", xp: 25, note: "Distributed to founder groups" },
     ],
-    insight: "Publishing plus distribution in the same day — that's the whole TFE engine in miniature.",
+    insight: "Publishing plus distribution in the same day: that's the whole TFE engine in miniature.",
   },
   {
     daysBack: 5,
     text: "Two Reefly user interviews. Both asked for better weekly summaries, neither mentioned the feature I expected.",
     entries: [{ skillId: "customer_discovery", xp: 75, note: "Two user interviews" }],
-    insight: "Two interviews asking for the same thing you didn't plan to build — that's a signal, not noise.",
+    insight: "Two interviews asking for the same thing you didn't plan to build: that's a signal, not noise.",
   },
   {
     daysBack: 4,
@@ -331,7 +331,7 @@ const SAMPLE_HISTORY: SampleEntry[] = [
       { skillId: "governance", xp: 50, note: "Handled data-permissions objection" },
       { skillId: "security", xp: 25, note: "Discussed access controls" },
     ],
-    insight: "You converted a security objection into a governance conversation. That's a repeatable play — write it down.",
+    insight: "You converted a security objection into a governance conversation. That's a repeatable play: write it down.",
   },
   {
     daysBack: 3,
@@ -349,7 +349,7 @@ const SAMPLE_HISTORY: SampleEntry[] = [
       { skillId: "networking", xp: 50, note: "Three founder intros" },
       { skillId: "partnerships", xp: 25, note: "Qualified a potential design partner" },
     ],
-    insight: "TFE is starting to feed the GTM pipeline. That flywheel is the strategy — keep it turning.",
+    insight: "TFE is starting to feed the GTM pipeline. That flywheel is the strategy: keep it turning.",
   },
   {
     daysBack: 1,
@@ -498,6 +498,8 @@ export function buildSeedState(withSampleData: boolean, now: Date = new Date()):
         id: crypto.randomUUID(),
         title: "Schedule one Reefly user interview",
         category: "reefly",
+        notes: "Ask what they actually paid for last quarter: not a feature wishlist.",
+        pinned: true,
         completed: false,
         createdAt: now.toISOString(),
         completedAt: null,
@@ -505,6 +507,7 @@ export function buildSeedState(withSampleData: boolean, now: Date = new Date()):
     ],
     weeklyReviews: [],
     notes: [],
+    noteFolders: [],
     inventory: { gold: 0, owned: [], equipped: [] },
     chat: [],
     contextNotes: [],

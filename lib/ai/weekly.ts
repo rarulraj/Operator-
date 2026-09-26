@@ -82,24 +82,24 @@ function fallbackReview(stats: WeekStats, state: AppState): string {
   );
   lines.push("");
   lines.push(
-    `**Progress** — Work +${stats.byCategory.work} · Brand +${stats.byCategory.brand} · AI GTM +${stats.byCategory.ai_gtm} · Reefly +${stats.byCategory.reefly}`,
+    `**Progress**: Work +${stats.byCategory.work} · Brand +${stats.byCategory.brand} · AI GTM +${stats.byCategory.ai_gtm} · Reefly +${stats.byCategory.reefly}`,
   );
   if (stats.topSkills.length) {
     lines.push(
-      `**Strongest skills this week** — ${stats.topSkills.map((s) => `${s.name} (+${s.xp})`).join(", ")}`,
+      `**Strongest skills this week**: ${stats.topSkills.map((s) => `${s.name} (+${s.xp})`).join(", ")}`,
     );
   }
   if (stats.biggestWinSource) {
-    lines.push(`**Biggest win** — ${stats.biggestWinSource}.`);
+    lines.push(`**Biggest win**: ${stats.biggestWinSource}.`);
   }
   if (stats.missionsCompleted.length) {
-    lines.push(`**Missions completed** — ${stats.missionsCompleted.join("; ")}.`);
+    lines.push(`**Missions completed**: ${stats.missionsCompleted.join("; ")}.`);
   }
   lines.push(
-    `**Biggest gap** — ${CATEGORY_MAP[weakest[0]].name} received the least XP (${weakest[1]}). Weakest skill overall: ${weakestSkill?.name ?? "—"}.`,
+    `**Biggest gap**: ${CATEGORY_MAP[weakest[0]].name} received the least XP (${weakest[1]}). Weakest skill overall: ${weakestSkill?.name ?? "none"}.`,
   );
   lines.push(
-    `**Next week** — Keep the ${CATEGORY_MAP[strongest[0]].shortName} momentum, but deliberately route one meaningful task into ${CATEGORY_MAP[weakest[0]].shortName}. Continue the campaign from Week ${state.campaign.currentWeek}, Day ${state.campaign.currentDay}.`,
+    `**Next week**: Keep the ${CATEGORY_MAP[strongest[0]].shortName} momentum, but deliberately route one meaningful task into ${CATEGORY_MAP[weakest[0]].shortName}. Continue the campaign from Week ${state.campaign.currentWeek}, Day ${state.campaign.currentDay}.`,
   );
   return lines.join("\n");
 }
@@ -137,7 +137,7 @@ Data:
 - Biggest single XP event: ${stats.biggestWinSource ?? "none"}
 - Campaign position: Week ${state.campaign.currentWeek} Day ${state.campaign.currentDay}
 
-Cover: major accomplishments, total XP, progress per area (AI GTM / TFE / Reefly), biggest win, biggest gap, recommended focus for next week, and 2-3 suggested quests for next week. Sharp and honest, under 250 words.`,
+Cover: major accomplishments, total XP, progress per area (AI GTM / TFE / Reefly), biggest win, biggest gap, recommended focus for next week, and 2-3 suggested quests for next week. Sharp and honest, under 250 words. If he was at a conference or on the road this week, review that week, not a generic desk week.`,
           },
         ],
       });

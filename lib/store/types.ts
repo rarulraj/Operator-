@@ -25,7 +25,7 @@ import type {
 export interface Store {
   getState(): Promise<AppState>;
   /** One read-modify-write. Use this for compound game ops so XP and gold
-   *  land in a single flush instead of 4–5 disk writes. */
+   *  land in a single flush instead of 4 or 5 disk writes. */
   mutate?(fn: (state: AppState) => void): Promise<AppState>;
   addXpEvents(events: XpEvent[]): Promise<void>;
   /** Remove an XP event (used when a task is un-completed). */
@@ -40,6 +40,7 @@ export interface Store {
   updateTodo(id: string, patch: Partial<TodoItem>): Promise<void>;
   deleteTodo(id: string): Promise<void>;
   addNote(note: NoteItem): Promise<void>;
+  updateNote(id: string, patch: Partial<NoteItem>): Promise<void>;
   deleteNote(id: string): Promise<void>;
   saveInventory(inventory: Inventory): Promise<void>;
   addChatMessages(messages: ChatMessage[]): Promise<void>;

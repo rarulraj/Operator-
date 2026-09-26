@@ -1,4 +1,6 @@
+import type { Situation } from "./ai/situation";
 import { defaultSkillForCategory } from "./skills";
+import { todoRank } from "./todos";
 import type { AppState, CategoryId, DailyQuest, Mission, TodoItem } from "./types";
 
 const DAY = 86_400_000;
@@ -11,7 +13,7 @@ const GENERIC_TASK =
 
 /** The one task that is on every single day, no matter what. */
 export const JOURNAL_TASK =
-  "Journal the day in the Activity Log — what actually moved, what stalled, and the one thing tomorrow";
+  "Journal the day in the Activity Log: what actually moved, what stalled, and the one thing tomorrow";
 
 export function isGenericQuest(quest: DailyQuest): boolean {
   if (GENERIC_TITLE.test(quest.title) || GENERIC_TITLE.test(quest.description)) {
@@ -53,6 +55,8 @@ function pickTodo(
   used: Set<string>,
 ): TodoItem | null {
   const ranked = [...todos].sort((a, b) => {
+    const urg = todoRank(a) - todoRank(b);
+    if (urg !== 0) return urg;
     const ai = prefer.indexOf(a.category as CategoryId);
     const bi = prefer.indexOf(b.category as CategoryId);
     return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
@@ -63,11 +67,11 @@ function pickTodo(
 function missionAction(mission: Mission): string {
   switch (mission.id) {
     case "mission-linkedin-10k":
-      return "Publish one LinkedIn post from a real TDengine or customer moment — not a take, a specific story";
+      return "Publish one LinkedIn post from a real TDengine or customer moment: not a take, a specific story";
     case "mission-tdengine-promotion":
       return "Add one piece of promotion evidence: a customer outcome, POC note, or enablement asset you can point at";
     case "mission-shredded-2027":
-      return "Hit today's training or lock protein — shredded by July only happens if this week is clean";
+      return "Hit today's training or lock protein: shredded by July only happens if this week is clean";
     case "mission-bench-225":
       return "Get a bench session in, or log the working sets if you already lifted";
     case "mission-reefly-250":
@@ -81,30 +85,63 @@ function missionAction(mission: Mission): string {
     case "mission-first-million":
       return "One money move: transfer, invest, or write down this month's savings rate";
     case "mission-enterprise-poc":
-      return "Move the live POC one step — charter, metric, or a written production path";
+      return "Move the live POC one step: charter, metric, or a written production path";
     default:
-      return `Move "${mission.title}" — one concrete action, not a plan`;
+      return `Move "${mission.title}": one concrete action, not a plan`;
   }
 }
 
-function daySpine(dow: number): {
+function conferenceSpine(): {
   title: string;
   why: string;
   category: CategoryId;
   prefer: CategoryId[];
 } {
+  return {
+    title: "On the floor",
+    why: "You are at the conference. The day is demos, names, and one public extract. Inbox and founder homework wait until you are home.",
+    category: "work",
+    prefer: ["work", "brand", "ai_gtm", "social"],
+  };
+}
+
+function travelSpine(): {
+  title: string;
+  why: string;
+  category: CategoryId;
+  prefer: CategoryId[];
+} {
+  return {
+    title: "On the road",
+    why: "You are not at your desk. Protect one real conversation and one written extract. Do not invent a full home-office day.",
+    category: "work",
+    prefer: ["work", "brand", "social"],
+  };
+}
+
+function daySpine(
+  dow: number,
+  mode: Situation["mode"] = "normal",
+): {
+  title: string;
+  why: string;
+  category: CategoryId;
+  prefer: CategoryId[];
+} {
+  if (mode === "conference") return conferenceSpine();
+  if (mode === "travel") return travelSpine();
   // 0 Sun … 6 Sat. Built around Arun's actual week, not a course.
   switch (dow) {
     case 1:
       return {
         title: "Promotion case, not tickets",
-        why: "Monday is for evidence. One TDengine outcome you can put in the Senior SE packet — not a clean inbox.",
+        why: "Monday is for evidence. One TDengine outcome you can put in the Senior SE packet: not a clean inbox.",
         category: "work",
         prefer: ["work", "ai_gtm", "brand"],
       };
     case 2:
       return {
-        title: "Customer work → LinkedIn",
+        title: "Customer work to LinkedIn",
         why: "A demo, escalation, or architecture conversation is wasted if it dies in Slack. Extract one public post from it.",
         category: "brand",
         prefer: ["work", "brand", "ai_gtm"],
@@ -156,9 +193,14 @@ function staleMission(state: AppState, missions: Mission[], recent: Record<strin
   return ranked[0] ?? null;
 }
 
-/** Build a day that is about Arun's real board — not a discovery worksheet. */
-export function buildPersonalQuest(state: AppState, now = new Date()): DailyQuest {
-  const spine = daySpine(now.getDay());
+/** Build a day that is about Arun's real board: not a discovery worksheet. */
+export function buildPersonalQuest(
+  state: AppState,
+  now = new Date(),
+  situation?: Situation,
+): DailyQuest {
+  const mode = situation?.mode ?? "normal";
+  const spine = daySpine(now.getDay(), mode);
   const recent = recentCategoryXp(state, 7);
   const openTodos = state.todos.filter((t) => !t.completed);
   const missions = state.missions.filter((m) => m.status === "active");
@@ -179,30 +221,49 @@ export function buildPersonalQuest(state: AppState, now = new Date()): DailyQues
   }
 
   const drives: QuestBeat[] = [];
-  const mission = staleMission(state, missions, recent);
-  if (mission) {
-    drives.push({
-      title: missionAction(mission),
-      category: mission.category === "general" ? spine.category : mission.category,
-    });
-  }
-  if (daysSinceCategory(state, "brand") >= 2) {
+  if (mode === "conference") {
     drives.push({
       title:
-        "Post on LinkedIn from a real moment this week — customer, demo, or a decision you made. Goal is 10,000 followers, not likes on a take.",
+        "Run the booth demo and have one real conversation: name, company, why they stopped",
+      category: "work",
+    });
+    drives.push({
+      title:
+        "Write the LinkedIn post from the floor tonight: a specific moment, not a recap of the event",
       category: "brand",
     });
-  }
-  if (
-    now.getDay() === 0 ||
-    now.getDay() === 6 ||
-    daysSinceCategory(state, "physical") >= 3
-  ) {
+  } else if (mode === "travel") {
     drives.push({
       title:
-        "Train: bench work or a hard session. July 2027 shredded does not care that you were busy.",
-      category: "physical",
+        "One real conversation on the road and one written follow-up before the day ends",
+      category: "work",
     });
+  } else {
+    const mission = staleMission(state, missions, recent);
+    if (mission) {
+      drives.push({
+        title: missionAction(mission),
+        category: mission.category === "general" ? spine.category : mission.category,
+      });
+    }
+    if (daysSinceCategory(state, "brand") >= 2) {
+      drives.push({
+        title:
+          "Post on LinkedIn from a real moment this week: customer, demo, or a decision you made. Goal is 10,000 followers, not likes on a take.",
+        category: "brand",
+      });
+    }
+    if (
+      now.getDay() === 0 ||
+      now.getDay() === 6 ||
+      daysSinceCategory(state, "physical") >= 3
+    ) {
+      drives.push({
+        title:
+          "Train: bench work or a hard session. July 2027 shredded does not care that you were busy.",
+        category: "physical",
+      });
+    }
   }
 
   // One from the board, one from the drives, then fill from whatever's left.
@@ -220,7 +281,7 @@ export function buildPersonalQuest(state: AppState, now = new Date()): DailyQues
     take({ title: spine.why, category: spine.category });
   }
 
-  // Two dynamic beats, then journaling — which is never optional. The day
+  // Two dynamic beats, then journaling: which is never optional. The day
   // isn't closed until it's written down.
   const unique: QuestBeat[] = [
     ...dynamic,

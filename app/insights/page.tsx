@@ -40,7 +40,7 @@ export default async function InsightsPage() {
       <div>
         <h1 className="text-xl font-semibold tracking-tight text-zinc-50">Insights</h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Progression over time — and the evidence that you&apos;re becoming the person
+          Progression over time: and the evidence that you&apos;re becoming the person
           you said you wanted to become.
         </p>
       </div>
@@ -93,7 +93,7 @@ export default async function InsightsPage() {
       </div>
 
       <Card className="animate-fade-up">
-        <CardHeader title="Cumulative XP — Last 30 Days" />
+        <CardHeader title="Cumulative XP: Last 30 Days" />
         <div className="px-3 pb-4 pt-2">
           <CumulativeChart data={cumulative} />
         </div>
@@ -143,7 +143,7 @@ export default async function InsightsPage() {
         {/* Streak calendar */}
         <Card className="animate-fade-up">
           <CardHeader
-            title="Streak History — Last 35 Days"
+            title="Streak History: Last 35 Days"
             icon={<Flame size={14} className="text-orange-400" />}
           />
           <div className="px-5 pb-5 pt-3">
@@ -160,7 +160,7 @@ export default async function InsightsPage() {
               ))}
             </div>
             <p className="mt-3 text-[11px] text-zinc-600">
-              A day counts when you earn XP — quest, journal entry, or mission.
+              A day counts when you earn XP: quest, journal entry, or mission.
             </p>
           </div>
         </Card>

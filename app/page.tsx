@@ -5,8 +5,10 @@ import { CoachPanel } from "@/components/coach-panel";
 import { PlayerHeader } from "@/components/player-header";
 import { QuestCard } from "@/components/quest-card";
 import { SkillGrowth } from "@/components/skill-growth";
+import { TaskBriefPanel } from "@/components/task-brief";
 import { TasksClient } from "@/components/tasks-client";
 import { coachRecommendations } from "@/lib/ai/coach";
+import { summarizeBoard } from "@/lib/ai/task-brief";
 import { ensureTodayQuest, totalXp } from "@/lib/game";
 import { CATEGORIES } from "@/lib/skills";
 import { getStore } from "@/lib/store";
@@ -19,6 +21,7 @@ export default async function DashboardPage() {
   const quest = await ensureTodayQuest(state);
   const xp = totalXp(state);
   const coach = await coachRecommendations(state, { allowAi: false });
+  const brief = await summarizeBoard(state, { allowAi: false });
 
   return (
     <div className="space-y-5">
@@ -42,15 +45,18 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <QuestCard quest={quest} />
-        <TasksClient
-          todos={[...state.todos].sort(
-            (a, b) =>
-              Number(a.completed) - Number(b.completed) ||
-              +new Date(b.createdAt) - +new Date(a.createdAt),
-          )}
-          missions={state.missions}
-          maxOpen={6}
-        />
+        <div className="space-y-4">
+          <TaskBriefPanel initial={brief} />
+          <TasksClient
+            todos={[...state.todos].sort(
+              (a, b) =>
+                Number(a.completed) - Number(b.completed) ||
+                +new Date(b.createdAt) - +new Date(a.createdAt),
+            )}
+            missions={state.missions}
+            maxOpen={6}
+          />
+        </div>
       </div>
 
       <BossBattles missions={state.missions} />

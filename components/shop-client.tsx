@@ -1,8 +1,9 @@
 "use client";
 
-import { Check, Coins, Store } from "lucide-react";
-import { useState, useTransition } from "react";
+import { Check, Coins, Search, Store } from "lucide-react";
+import { useMemo, useState, useTransition } from "react";
 import { buyItemAction, equipItemAction } from "@/app/actions";
+import { CompanionMark } from "@/components/character";
 import { SHOP_ITEMS, type ShopItem, type ShopItemType } from "@/lib/shop";
 import type { Inventory } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -13,43 +14,51 @@ const SECTIONS: { type: ShopItemType; label: string }[] = [
   { type: "aura", label: "Auras" },
   { type: "companion", label: "Companions" },
   { type: "title", label: "Titles" },
+  { type: "backdrop", label: "Backdrops" },
 ];
 
 function ItemPreview({ item }: { item: ShopItem }) {
   if (item.type === "frame") {
-    const cls =
-      item.id === "frame-gold"
-        ? "border-xp shadow-[2px_2px_0_0_rgba(242,184,59,0.45)]"
-        : item.id === "frame-void"
-          ? "border-violet-500 shadow-[2px_2px_0_0_rgba(139,92,246,0.45)]"
-          : "border-amber-800 shadow-[2px_2px_0_0_rgba(120,72,20,0.5)]";
-    return <div className={cn("h-10 w-10 rounded-lg border-2 bg-[#17110c]", cls)} />;
+    return (
+      <div
+        className={cn(
+          "h-10 w-10 rounded-lg border-2 bg-[#17110c]",
+          item.style ?? "border-ink-600",
+        )}
+      />
+    );
   }
   if (item.type === "aura") {
     return (
       <div
         className={cn(
           "h-10 w-10 rounded-lg border border-ink-700 bg-[#17110c]",
-          item.id === "aura-golden" ? "aura-golden" : "aura-ember",
+          item.style,
         )}
       />
     );
   }
-  if (item.type === "companion" && item.sprite) {
-    // eslint-disable-next-line @next/next/no-img-element
+  if (item.type === "backdrop") {
     return (
-      <img
-        src={item.sprite}
-        alt={item.name}
-        width={40}
-        height={40}
-        className="pixelated rounded-lg border border-ink-700 bg-[#17110c]"
+      <div
+        className={cn(
+          "h-10 w-10 rounded-lg border border-ink-600",
+          item.style ?? "bg-[#17110c]",
+        )}
       />
     );
   }
-  // title
+  if (item.type === "companion") {
+    return (
+      <CompanionMark
+        item={item}
+        size={40}
+        className="rounded-lg border border-ink-700 bg-[#17110c]"
+      />
+    );
+  }
   return (
-    <div className="flex h-10 items-center rounded-lg border border-ink-700 bg-ink-800 px-2.5 font-pixel text-[9px] font-bold uppercase tracking-wider text-zinc-300">
+    <div className="flex h-10 max-w-[7.5rem] items-center rounded-lg border border-ink-700 bg-ink-800 px-2.5 font-pixel text-[9px] font-bold uppercase tracking-wider text-zinc-300">
       {item.titleText}
     </div>
   );
@@ -136,25 +145,61 @@ export function ShopClient({
   totalXp: number;
 }) {
   void totalXp;
+  const [query, setQuery] = useState("");
+  const q = query.trim().toLowerCase();
+  const catalog = useMemo(
+    () =>
+      q
+        ? SHOP_ITEMS.filter(
+            (i) =>
+              i.name.toLowerCase().includes(q) ||
+              i.description.toLowerCase().includes(q) ||
+              i.type.includes(q) ||
+              (i.titleText ?? "").toLowerCase().includes(q),
+          )
+        : SHOP_ITEMS,
+    [q],
+  );
+
   return (
     <div className="space-y-6">
-      {/* Wallet */}
-      <Card className="animate-fade-up flex items-center gap-3 px-5 py-4">
+      <Card className="animate-fade-up flex flex-wrap items-center gap-3 px-5 py-4">
         <Store size={16} className="text-zinc-500" />
         <span className="text-sm text-zinc-400">Your wallet</span>
         <span className="ml-auto flex items-center gap-1.5 font-pixel text-base font-bold text-xp">
           <Coins size={15} />
           <span className="tnum">{inventory.gold}</span>
         </span>
+        <span className="text-[11px] uppercase tracking-wider text-zinc-600">
+          {SHOP_ITEMS.length} in stock · {inventory.owned.length} owned
+        </span>
       </Card>
 
+      <div className="relative">
+        <Search
+          size={14}
+          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"
+        />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search frames, auras, pets, titles…"
+          className="w-full rounded-lg border border-ink-700 bg-ink-850 py-2 pl-9 pr-3 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-ink-600"
+        />
+      </div>
+
       {SECTIONS.map(({ type, label }) => {
-        const items = SHOP_ITEMS.filter((i) => i.type === type);
+        const items = catalog.filter((i) => i.type === type);
         if (!items.length) return null;
         return (
           <section key={type}>
-            <div className="mb-3 text-[13px] font-medium uppercase tracking-wider text-zinc-400">
-              {label}
+            <div className="mb-3 flex items-baseline justify-between">
+              <div className="text-[13px] font-medium uppercase tracking-wider text-zinc-400">
+                {label}
+              </div>
+              <div className="text-[11px] tabular-nums text-zinc-600">
+                {items.length}
+              </div>
             </div>
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
               {items.map((item) => (
@@ -164,6 +209,12 @@ export function ShopClient({
           </section>
         );
       })}
+
+      {catalog.length === 0 && (
+        <p className="py-10 text-center text-sm text-zinc-500">
+          Nothing in stock matches that.
+        </p>
+      )}
     </div>
   );
 }

@@ -1,8 +1,16 @@
-import { SHOP_ITEM_MAP } from "@/lib/shop";
+import {
+  AURA_STYLES,
+  BACKDROP_STYLES,
+  FRAME_STYLES,
+  SHOP_ITEM_MAP,
+  type ShopItem,
+} from "@/lib/shop";
 import type { Inventory } from "@/lib/types";
 import { rankFromXp } from "@/lib/xp";
 
-// ── The Operator — your digital character ───────────────────────────────────
+export { AURA_STYLES, FRAME_STYLES };
+
+// ── The Operator: your digital character ───────────────────────────────────
 // Sprite evolves with rank. Lines stay grounded: farm-quiet, advisor-adjacent.
 
 export const STAGE_BY_RANK: Record<string, { src: string; stage: string }> = {
@@ -24,19 +32,39 @@ function statusLine(streak: number, questDoneToday: boolean): string {
   return "Another day on the books. Keep tilling.";
 }
 
-// Equipped shop cosmetics → portrait styling
-export const FRAME_STYLES: Record<string, string> = {
-  "frame-oak":
-    "border-amber-800 shadow-[3px_3px_0_0_rgba(120,72,20,0.5)]",
-  "frame-gold":
-    "border-xp shadow-[3px_3px_0_0_rgba(242,184,59,0.45)]",
-  "frame-void":
-    "border-violet-500 shadow-[3px_3px_0_0_rgba(139,92,246,0.45)]",
-};
-export const AURA_STYLES: Record<string, string> = {
-  "aura-ember": "aura-ember",
-  "aura-golden": "aura-golden",
-};
+// Equipped shop cosmetics → portrait styling (maps live in lib/shop.ts)
+
+export function CompanionMark({
+  item,
+  size,
+  className = "",
+}: {
+  item: ShopItem;
+  size: number;
+  className?: string;
+}) {
+  if (item.sprite) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={item.sprite}
+        alt={item.name}
+        width={size}
+        height={size}
+        className={`pixelated ${className}`}
+      />
+    );
+  }
+  return (
+    <div
+      className={`flex items-center justify-center ${className}`}
+      style={{ width: size, height: size, fontSize: Math.round(size * 0.62) }}
+      aria-label={item.name}
+    >
+      {item.glyph ?? "🐾"}
+    </div>
+  );
+}
 
 export function Character({
   totalXp,
@@ -59,11 +87,13 @@ export function Character({
   const aura = equipped.find((id) => id.startsWith("aura-"));
   const companionId = equipped.find((id) => id.startsWith("companion-"));
   const companion = companionId ? SHOP_ITEM_MAP[companionId] : null;
+  const backdrop = equipped.find((id) => id.startsWith("backdrop-"));
 
   const frameClass =
     (frame && FRAME_STYLES[frame]) ??
     "border-ink-600/70 shadow-[3px_3px_0_0_rgba(0,0,0,0.35)]";
   const glowClass = (aura && AURA_STYLES[aura]) ?? "sprite-glow";
+  const fillClass = (backdrop && BACKDROP_STYLES[backdrop]) ?? "bg-[#17110c]";
 
   return (
     <div className="flex items-center gap-4">
@@ -71,20 +101,16 @@ export function Character({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={stage.src}
-          alt={`Your character — ${stage.stage} stage`}
+          alt={`Your character: ${stage.stage} stage`}
           width={size}
           height={size}
-          className={`animate-sprite-idle ${glowClass} pixelated rounded-xl border bg-[#17110c] ${frameClass}`}
+          className={`animate-sprite-idle ${glowClass} pixelated rounded-xl border ${fillClass} ${frameClass}`}
         />
-        {companion?.sprite && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={companion.sprite}
-            alt={companion.name}
-            width={Math.round(size * 0.42)}
-            height={Math.round(size * 0.42)}
-            className="animate-sprite-idle pixelated absolute -bottom-2 -left-3 rounded-lg border border-ink-600/70 bg-[#17110c]"
-            style={{ animationDelay: "0.4s" }}
+        {companion && (
+          <CompanionMark
+            item={companion}
+            size={Math.round(size * 0.42)}
+            className="animate-sprite-idle absolute -bottom-2 -left-3 rounded-lg border border-ink-600/70 bg-[#17110c]"
           />
         )}
         <span className="absolute -bottom-1.5 -right-1.5 rounded-md border border-xp/40 bg-ink-900 px-1.5 py-0.5 font-pixel text-[8px] font-bold uppercase text-xp">

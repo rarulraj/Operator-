@@ -24,9 +24,14 @@ export interface TodoItem {
   title: string;
   category: TrackableCategory;
   /** Optional mission this task serves. Completing the task nudges the
-   *  mission's progress (+1, capped at 99 — only you can declare a mission
+   *  mission's progress (+1, capped at 99: only you can declare a mission
    *  complete). */
   missionId?: string | null;
+  /** Working notes on this task: context, blockers, next step. */
+  notes?: string;
+  /** Pinned tasks float to the top of their pillar and get first pick on
+   *  the daily quest. */
+  pinned?: boolean;
   completed: boolean;
   createdAt: string;
   completedAt: string | null;
@@ -128,11 +133,26 @@ export interface CampaignProgress {
   version?: number;
 }
 
-/** A quick jot from the scratchpad — no XP, no structure. */
+/** A folder in the Notes sidebar, Apple Notes style. */
+export interface NoteFolder {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
+/** A note. `text` is the legacy scratchpad field; migrated into title+body. */
 export interface NoteItem {
   id: string;
-  text: string;
+  title: string;
+  /** HTML body (headings, lists, checklists, images). */
+  body: string;
+  folderId: string | null;
+  pinned: boolean;
   createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  /** @deprecated migrated to title/body */
+  text?: string;
 }
 
 /** Gold wallet + owned/equipped shop items (ids from lib/shop.ts). */
@@ -168,6 +188,7 @@ export interface AppState {
   missions: Mission[];
   todos: TodoItem[];
   notes: NoteItem[];
+  noteFolders: NoteFolder[];
   inventory: Inventory;
   chat: ChatMessage[];
   contextNotes: ContextNote[];

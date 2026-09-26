@@ -64,7 +64,7 @@ export default async function SkillsPage() {
         <h1 className="text-xl font-semibold tracking-tight text-zinc-50">Skill Tree</h1>
         <p className="mt-1 text-sm text-zinc-500">
           {CATEGORIES.length} pillars, {state.skills.length} skills. Completing a
-          task, quest, or log should move the matching tree — if it does not, that is a bug.
+          task, quest, or log should move the matching tree: if it does not, that is a bug.
         </p>
       </div>
 
@@ -75,7 +75,7 @@ export default async function SkillsPage() {
         return (
           <Card key={cat.id} className="animate-fade-up">
             <CardHeader
-              title={`${cat.name} — Lv ${catLvl.level}`}
+              title={`${cat.name}: Lv ${catLvl.level}`}
               icon={<Network size={14} className={cat.tailwind} />}
               action={
                 <span className={`tnum text-[12px] font-medium ${cat.tailwind}`}>

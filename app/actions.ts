@@ -1,10 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { chatReply } from "@/lib/ai/chat";
+import { chatReply, helperReply } from "@/lib/ai/chat";
 import { classifyActivity, type ClassificationResult } from "@/lib/ai/classify";
 import { coachRecommendations } from "@/lib/ai/coach";
 import { questReflection } from "@/lib/ai/reflect";
+import { summarizeBoard } from "@/lib/ai/task-brief";
 import { generateWeeklyReview } from "@/lib/ai/weekly";
 import {
   addQuestTask,
@@ -21,10 +22,13 @@ import {
   toggleQuestTask,
   toggleTodo,
   updateMission,
+  updateTodoFields,
+  type TodoPatch,
 } from "@/lib/game";
 import { getStore } from "@/lib/store";
 import { dateKey } from "@/lib/store/types";
-import type { CategoryId, ClassifiedActivity, TrackableCategory } from "@/lib/types";
+import { blankNote, blankFolder } from "@/lib/notes";
+import type { CategoryId, ClassifiedActivity, NoteFolder, NoteItem, TrackableCategory } from "@/lib/types";
 
 function revalidateAll() {
   revalidatePath("/", "layout");
@@ -97,7 +101,7 @@ export async function removeQuestTaskAction(
   revalidateAll();
 }
 
-/** Journaling is the one quest task that can't just be ticked — the entry has
+/** Journaling is the one quest task that can't just be ticked: the entry has
  *  to be written and saved to the Activity Log. */
 export async function saveQuestJournalAction(
   questId: string,
@@ -180,6 +184,12 @@ export async function coachAction(): Promise<string[]> {
   return coachRecommendations(state);
 }
 
+export async function taskBriefAction() {
+  const store = getStore();
+  const state = await store.getState();
+  return summarizeBoard(state);
+}
+
 export async function generateWeeklyReviewAction(): Promise<{
   id: string;
   content: string;
@@ -199,9 +209,18 @@ export async function addTodoAction(
   title: string,
   category: TrackableCategory,
   missionId?: string | null,
+  extras?: { notes?: string },
 ): Promise<void> {
   if (!title.trim()) return;
-  await addTodo(title, category, missionId);
+  await addTodo(title, category, missionId, extras);
+  revalidateAll();
+}
+
+export async function updateTodoAction(
+  todoId: string,
+  patch: TodoPatch,
+): Promise<void> {
+  await updateTodoFields(todoId, patch);
   revalidateAll();
 }
 
@@ -215,15 +234,106 @@ export async function deleteTodoAction(todoId: string): Promise<void> {
   revalidateAll();
 }
 
-// ── Notes (scratchpad) ──────────────────────────────────────────────────────
+/** Turn a scratchpad jot into a board task. First line is the title; the
+ *  rest (or the whole jot, if it's one line) becomes the task note. */
+export async function noteToTaskAction(noteId: string): Promise<void> {
+  const store = getStore();
+  const state = await store.getState();
+  const note = state.notes.find((n) => n.id === noteId);
+  if (!note) return;
+  const raw = (note.title || note.text || "").trim() || "Untitled";
+  const extra = (note.body || note.text || "").replace(/<[^>]+>/g, " ").trim();
+  const title = raw.split("\n")[0].slice(0, 120);
+  const body = extra && extra !== title ? extra : "";
+  await addTodo(title, "general", null, { notes: body });
+  revalidateAll();
+}
+
+// ── Notes (Apple Notes) ─────────────────────────────────────────────────────
+
+export async function createNoteAction(folderId: string | null): Promise<NoteItem> {
+  const note = blankNote(folderId);
+  await getStore().addNote(note);
+  return note;
+}
+
+export async function saveNoteAction(
+  noteId: string,
+  patch: Partial<Pick<NoteItem, "title" | "body" | "pinned" | "folderId" | "deletedAt">>,
+): Promise<void> {
+  const store = getStore();
+  await store.updateNote(noteId, {
+    ...patch,
+    updatedAt: new Date().toISOString(),
+  });
+}
+
+export async function trashNoteAction(noteId: string): Promise<void> {
+  await getStore().updateNote(noteId, {
+    deletedAt: new Date().toISOString(),
+  });
+}
+
+export async function restoreNoteAction(noteId: string): Promise<void> {
+  await getStore().updateNote(noteId, { deletedAt: null });
+}
+
+export async function purgeNoteAction(noteId: string): Promise<void> {
+  await getStore().deleteNote(noteId);
+}
+
+export async function emptyTrashAction(): Promise<void> {
+  const store = getStore();
+  if (!store.mutate) return;
+  await store.mutate((state) => {
+    state.notes = state.notes.filter((n) => !n.deletedAt);
+  });
+}
+
+export async function createFolderAction(name: string): Promise<NoteFolder> {
+  const folder = blankFolder(name);
+  const store = getStore();
+  if (store.mutate) {
+    await store.mutate((state) => {
+      state.noteFolders.push(folder);
+    });
+  }
+  return folder;
+}
+
+export async function renameFolderAction(id: string, name: string): Promise<void> {
+  const store = getStore();
+  if (!store.mutate) return;
+  await store.mutate((state) => {
+    const f = state.noteFolders.find((x) => x.id === id);
+    if (f) f.name = name.trim() || f.name;
+  });
+}
+
+export async function deleteFolderAction(id: string): Promise<void> {
+  const store = getStore();
+  if (!store.mutate) return;
+  await store.mutate((state) => {
+    state.noteFolders = state.noteFolders.filter((f) => f.id !== id);
+    for (const n of state.notes) {
+      if (n.folderId === id) n.folderId = null;
+    }
+  });
+}
 
 export async function addNoteAction(text: string): Promise<void> {
   if (!text.trim()) return;
-  await getStore().addNote({
-    id: crypto.randomUUID(),
-    text: text.trim(),
-    createdAt: new Date().toISOString(),
-  });
+  const note = blankNote(null);
+  const trimmed = text.trim();
+  const first = trimmed.split("\n").find((l) => l.trim()) ?? "New Note";
+  note.title = first.slice(0, 120);
+  note.body = `<p>${trimmed
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\n/g, "<br>")}</p>`;
+  note.text = trimmed;
+  await getStore().addNote(note);
   revalidateAll();
 }
 
@@ -260,12 +370,23 @@ export async function sendChatMessageAction(
   return { ok: true, reply };
 }
 
+export async function askHelperAction(
+  text: string,
+  history: { role: "user" | "assistant"; content: string }[],
+): Promise<{ ok: boolean; reply?: string }> {
+  const trimmed = text.trim();
+  if (!trimmed) return { ok: false };
+  const state = await getStore().getState();
+  const reply = await helperReply(state, trimmed, history.slice(-12));
+  return { ok: true, reply };
+}
+
 export async function clearChatAction(): Promise<void> {
   await getStore().clearChat();
   revalidateAll();
 }
 
-/** Save a durable fact about Arun's life — injected into every AI prompt. */
+/** Save a durable fact about Arun's life: injected into every AI prompt. */
 export async function addContextNoteAction(text: string): Promise<void> {
   const trimmed = text.trim();
   if (!trimmed) return;
@@ -298,7 +419,7 @@ export async function uploadContextFileAction(
   const file = formData.get("file");
   if (!(file instanceof File)) return { ok: false, error: "No file received." };
   if (file.size > MAX_FILE_BYTES) {
-    return { ok: false, error: "File too large — 3 MB max." };
+    return { ok: false, error: "File too large: 3 MB max." };
   }
 
   const name = file.name || "attachment";
@@ -321,7 +442,7 @@ export async function uploadContextFileAction(
     } else {
       return {
         ok: false,
-        error: "Unsupported file type — use text files or PDFs.",
+        error: "Unsupported file type: use text files or PDFs.",
       };
     }
   } catch (err) {
@@ -394,6 +515,14 @@ export async function clearOpenAiKeyAction(): Promise<void> {
   revalidateAll();
 }
 
+export async function saveSituationAction(text: string): Promise<void> {
+  const { saveManualSituation } = await import("@/lib/config");
+  const { invalidateSituationCache } = await import("@/lib/ai/situation");
+  saveManualSituation(text);
+  invalidateSituationCache();
+  revalidateAll();
+}
+
 // ── Settings ────────────────────────────────────────────────────────────────
 
 export async function resetDataAction(withSampleData: boolean): Promise<void> {
@@ -405,4 +534,12 @@ export async function todayQuestAction() {
   const store = getStore();
   const state = await store.getState();
   return ensureTodayQuest(state);
+}
+
+export async function refreshWeekPlanAction() {
+  const { ensureWeekPlan } = await import("@/lib/ai/week-plan");
+  const state = await getStore().getState();
+  const plan = await ensureWeekPlan(state, { force: true });
+  revalidateAll();
+  return plan;
 }

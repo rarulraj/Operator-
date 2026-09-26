@@ -4,7 +4,7 @@ import { coachSystemPrompt, getOpenAI, openAiModel } from "./openai";
 // ── Quest completion reflection ─────────────────────────────────────────────
 
 const FALLBACK_REFLECTIONS = [
-  "Done is a skill. You practiced it today — the deliverable exists now and didn't this morning.",
+  "Done is a skill. You practiced it today: the deliverable exists now and didn't this morning.",
   "Another chapter closed. The compounding only counts because you finished, not because you started.",
   "Quest complete. The artifact you produced today is the kind of thing that becomes a sales asset later.",
   "Progress logged. Tomorrow's quest builds directly on what you made today.",

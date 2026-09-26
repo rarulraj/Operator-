@@ -35,7 +35,7 @@ export function CategoryCard({
         <div className="mt-2 truncate text-[11px] text-zinc-500">
           {topSkill && topSkill.xp > 0
             ? `Top skill: ${topSkill.name} · Lv ${levelFromXp(topSkill.xp).level}`
-            : "No XP yet — log real work to begin"}
+            : "No XP yet: log real work to begin"}
         </div>
       </Card>
     </Link>
