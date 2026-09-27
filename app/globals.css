@@ -385,6 +385,11 @@ body {
   min-height: 12rem;
   caret-color: #f2b83b;
 }
+/* Theme color on the editor is only the default. A <font color> from the
+   editor must keep the color the user picked, including inside headings. */
+.apple-notes .an-body font[color] {
+  color: attr(color type(<color>));
+}
 .apple-notes .an-body:empty:before {
   content: attr(data-placeholder);
   color: #6b5a45;

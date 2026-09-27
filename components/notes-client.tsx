@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Baseline,
   CheckSquare,
   ChevronLeft,
   Folder,
@@ -351,6 +352,7 @@ export function NotesClient({
               >
                 <Table size={16} />
               </ToolBtn>
+              <TextColorControl />
               <span className="mx-1 h-4 w-px bg-ink-700" />
               <ToolBtn
                 title={selected.pinned ? "Unpin" : "Pin"}
@@ -466,6 +468,118 @@ function FolderRow({
   );
 }
 
+const TEXT_COLORS = [
+  { name: "Cream", value: "#f4f0e8" },
+  { name: "White", value: "#ffffff" },
+  { name: "Gold", value: "#f2b83b" },
+  { name: "Coral", value: "#ff7a6e" },
+  { name: "Green", value: "#7dcea0" },
+  { name: "Blue", value: "#8eb6ff" },
+  { name: "Lilac", value: "#d7a6ff" },
+  { name: "Orange", value: "#ffb15a" },
+];
+
+function rememberEditorRange(): Range | null {
+  const sel = window.getSelection();
+  const editor = document.querySelector("[data-note-body]");
+  if (!sel || sel.rangeCount === 0 || !editor) return null;
+  const range = sel.getRangeAt(0);
+  if (!editor.contains(range.commonAncestorContainer)) return null;
+  return range.cloneRange();
+}
+
+function applyEditorTextColor(color: string, saved: Range | null) {
+  const editor = document.querySelector<HTMLElement>("[data-note-body]");
+  if (!editor) return;
+  editor.focus();
+  const sel = window.getSelection();
+  if (saved && sel) {
+    sel.removeAllRanges();
+    sel.addRange(saved);
+  }
+  document.execCommand("styleWithCSS", false, "true");
+  document.execCommand("foreColor", false, color);
+  document.execCommand("styleWithCSS", false, "false");
+  editor.dispatchEvent(new InputEvent("input", { bubbles: true }));
+}
+
+function TextColorControl() {
+  const [open, setOpen] = useState(false);
+  const [custom, setCustom] = useState("#f2b83b");
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const rangeRef = useRef<Range | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function onDoc(e: MouseEvent) {
+      if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
+
+  function apply(color: string) {
+    applyEditorTextColor(color, rangeRef.current);
+    const next = rememberEditorRange();
+    if (next) rangeRef.current = next;
+  }
+
+  return (
+    <div ref={wrapRef} className="relative">
+      <ToolBtn
+        title="Text color"
+        onClick={() => {
+          rangeRef.current = rememberEditorRange();
+          setOpen((v) => !v);
+        }}
+      >
+        <Baseline size={16} />
+      </ToolBtn>
+      {open && (
+        <div className="absolute left-0 top-full z-30 mt-1 w-[148px] rounded-lg border border-ink-700 bg-[#1e160d] p-2 shadow-lg">
+          <div className="grid grid-cols-4 gap-1.5">
+            {TEXT_COLORS.map((c) => (
+              <button
+                key={c.value}
+                type="button"
+                title={c.name}
+                aria-label={c.name}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  const live = rememberEditorRange();
+                  if (live) rangeRef.current = live;
+                }}
+                onClick={() => {
+                  apply(c.value);
+                  setOpen(false);
+                }}
+                className="h-6 w-6 rounded-full border border-white/15"
+                style={{ background: c.value }}
+              />
+            ))}
+          </div>
+          <label className="mt-2 flex items-center justify-between gap-2 text-[11px] text-zinc-400">
+            Custom
+            <input
+              type="color"
+              aria-label="Custom text color"
+              value={custom}
+              onMouseDown={() => {
+                rangeRef.current = rememberEditorRange();
+              }}
+              onChange={(e) => {
+                setCustom(e.target.value);
+                apply(e.target.value);
+              }}
+              className="h-6 w-8 cursor-pointer border-0 bg-transparent p-0"
+            />
+          </label>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ToolBtn({
   children,
   onClick,
@@ -570,6 +684,7 @@ function NoteEditor({
       </div>
       <div
         ref={bodyRef}
+        data-note-body=""
         contentEditable={!readOnly}
         data-placeholder="Start writing…"
         className="an-body flex-1 px-10 pb-24 pt-5"
