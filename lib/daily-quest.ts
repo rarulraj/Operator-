@@ -91,7 +91,7 @@ function missionAction(mission: Mission): string {
   }
 }
 
-function conferenceSpine(): {
+function conferenceSpine(focus?: string): {
   title: string;
   why: string;
   category: CategoryId;
@@ -99,7 +99,9 @@ function conferenceSpine(): {
 } {
   return {
     title: "On the floor",
-    why: "You are at the conference. The day is demos, names, and one public extract. Inbox and founder homework wait until you are home.",
+    why:
+      focus?.trim() ||
+      "You are at the conference. The day is demos, names, and one public extract. Inbox and founder homework wait until you are home.",
     category: "work",
     prefer: ["work", "brand", "ai_gtm", "social"],
   };
@@ -122,13 +124,14 @@ function travelSpine(): {
 function daySpine(
   dow: number,
   mode: Situation["mode"] = "normal",
+  focus?: string,
 ): {
   title: string;
   why: string;
   category: CategoryId;
   prefer: CategoryId[];
 } {
-  if (mode === "conference") return conferenceSpine();
+  if (mode === "conference") return conferenceSpine(focus);
   if (mode === "travel") return travelSpine();
   // 0 Sun … 6 Sat. Built around Arun's actual week, not a course.
   switch (dow) {
@@ -200,7 +203,7 @@ export function buildPersonalQuest(
   situation?: Situation,
 ): DailyQuest {
   const mode = situation?.mode ?? "normal";
-  const spine = daySpine(now.getDay(), mode);
+  const spine = daySpine(now.getDay(), mode, situation?.focus);
   const recent = recentCategoryXp(state, 7);
   const openTodos = state.todos.filter((t) => !t.completed);
   const missions = state.missions.filter((m) => m.status === "active");
@@ -208,16 +211,19 @@ export function buildPersonalQuest(
 
   // Two pools. The day gets one beat from each where possible, so a full
   // board can't crowd out the long-game missions (and an empty board still
-  // produces a real day).
+  // produces a real day). Conference and travel days do not inherit the
+  // desk board: inbox and founder homework wait.
   const board: QuestBeat[] = [];
-  for (let i = 0; i < 2; i++) {
-    const todo = pickTodo(openTodos, spine.prefer, usedTodos);
-    if (!todo) break;
-    usedTodos.add(todo.id);
-    board.push({
-      title: todo.title,
-      category: todo.category === "general" ? spine.category : todo.category,
-    });
+  if (mode !== "conference" && mode !== "travel") {
+    for (let i = 0; i < 2; i++) {
+      const todo = pickTodo(openTodos, spine.prefer, usedTodos);
+      if (!todo) break;
+      usedTodos.add(todo.id);
+      board.push({
+        title: todo.title,
+        category: todo.category === "general" ? spine.category : todo.category,
+      });
+    }
   }
 
   const drives: QuestBeat[] = [];

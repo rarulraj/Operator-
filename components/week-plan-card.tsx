@@ -48,8 +48,8 @@ export function WeekPlanCard({
         {live.manifesto}
       </p>
       <p className="px-5 pb-2 text-[12px] text-zinc-500">
-        Built from the plan you put in: missions, situation, board. Same scoreboard
-        all seven days.
+        Each day follows the knowledge graph. An old conference date does not
+        repaint the week.
       </p>
       <div className="grid grid-cols-1 gap-1.5 px-5 pb-5 pt-2 sm:grid-cols-2 lg:grid-cols-7">
         {ordered.map((day) => {

@@ -34,9 +34,9 @@ export function SituationSettings({
       />
       <div className="space-y-3 px-5 pb-5 pt-1">
         <p className="text-sm leading-relaxed text-zinc-400">
-          Conference, travel, on-site, sick day. The daily quest, coach, and
-          insights read this plus Hermes&apos; log. If the agent knows and the
-          board doesn&apos;t, put it here.
+          Conference, travel, on-site. Saving writes a fact for today only.
+          An older save does not keep that mode alive. The graph also reads
+          dated Hermes logs.
         </p>
         <textarea
           value={text}

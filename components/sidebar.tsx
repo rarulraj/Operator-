@@ -8,6 +8,7 @@ import {
   MessageSquare,
   MoonStar,
   Network,
+  Waypoints,
   PenLine,
   ScrollText,
   Settings,
@@ -33,6 +34,7 @@ const NAV = [
   { href: "/notes", label: "Notes", icon: StickyNote },
   { href: "/chat", label: "AI Chat", icon: MessageSquare },
   { href: "/insights", label: "Insights", icon: BarChart3 },
+  { href: "/graph", label: "Knowledge", icon: Waypoints },
   { href: "/idle", label: "Idle Mode", icon: MoonStar },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

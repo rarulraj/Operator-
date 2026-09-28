@@ -21,6 +21,8 @@ export interface WeekPlan {
   manifesto: string;
   days: WeekDayPlan[];
   mode: string;
+  /** Modes for Mon–Sun this week. Changes when the graph learns a new day. */
+  graphKey?: string;
 }
 
 interface LocalConfig {

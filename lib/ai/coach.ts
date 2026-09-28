@@ -36,7 +36,8 @@ function ruleBasedCoach(state: AppState, situation?: Situation): string[] {
   const recs: string[] = [];
   if (situation?.mode === "conference") {
     recs.push(
-      "You are at the conference. One real booth conversation (name, company, why they stopped) and a LinkedIn extract from the floor beat any desk work you invented this morning.",
+      situation.focus ||
+        "You are at the conference. The day is demos, names, and one public extract. Inbox and founder homework wait until you are home.",
     );
   } else if (situation?.mode === "travel") {
     recs.push(
