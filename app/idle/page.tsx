@@ -12,6 +12,8 @@ export default async function IdlePage() {
       totalXp={totalXp(state)}
       streak={state.streak.current}
       inventory={state.inventory}
+      rankTiers={state.rankTiers}
+      shopStock={state.shopStock}
     />
   );
 }

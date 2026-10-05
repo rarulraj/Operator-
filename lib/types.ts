@@ -1,5 +1,8 @@
 // ── Operator domain types ──────────────────────────────────────────────────
 
+import type { ShopItem } from "./shop";
+import type { Rank } from "./xp";
+
 /** Life pillars. ai_gtm/tfe/reefly are the ventures; work, physical,
  *  social, wealth, and brand (personal / LinkedIn) are the rest. */
 export type CategoryId =
@@ -208,6 +211,10 @@ export interface AppState {
   campaign: CampaignProgress;
   /** AI/rule-generated campaign weeks beyond the static Season 1 curriculum. */
   customWeeks: CurriculumWeek[];
+  /** Rank titles past the base ladder. The ladder does not end. */
+  rankTiers: Rank[];
+  /** Cosmetics stocked after the printed catalog. The shop keeps restocking. */
+  shopStock: ShopItem[];
   /** Daily scale log. One entry per date. */
   weightEntries: WeightEntry[];
   /** Display unit. Entries keep the unit they were logged in. */

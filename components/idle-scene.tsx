@@ -6,9 +6,9 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { SHOP_ITEM_MAP } from "@/lib/shop";
+import { findShopItem, type ShopItem } from "@/lib/shop";
 import type { Inventory } from "@/lib/types";
-import { levelFromXp, rankFromXp } from "@/lib/xp";
+import { levelFromXp, rankFromXp, type Rank } from "@/lib/xp";
 import { AURA_STYLES, FRAME_STYLES, STAGE_BY_RANK, CompanionMark } from "./character";
 
 /** Deterministic PRNG so the firefly layout is stable across renders. */
@@ -28,11 +28,15 @@ export function IdleScene({
   totalXp,
   streak,
   inventory,
+  rankTiers = [],
+  shopStock = [],
 }: {
   name: string;
   totalXp: number;
   streak: number;
   inventory: Inventory;
+  rankTiers?: Rank[];
+  shopStock?: ShopItem[];
 }) {
   const router = useRouter();
   const [now, setNow] = useState<Date | null>(null);
@@ -53,17 +57,21 @@ export function IdleScene({
     };
   }, [router]);
 
-  const rank = rankFromXp(totalXp);
-  const stage = STAGE_BY_RANK[rank.title] ?? STAGE_BY_RANK.Apprentice;
+  const rank = rankFromXp(totalXp, rankTiers);
+  const stage =
+    STAGE_BY_RANK[rank.title] ??
+    (rank.minXp >= 10450 ? STAGE_BY_RANK["Master Operator"] : STAGE_BY_RANK.Apprentice);
   const lvl = levelFromXp(totalXp);
 
   const equipped = inventory.equipped;
   const frame = equipped.find((id) => id.startsWith("frame-"));
   const aura = equipped.find((id) => id.startsWith("aura-"));
   const companionId = equipped.find((id) => id.startsWith("companion-"));
-  const companion = companionId ? SHOP_ITEM_MAP[companionId] : null;
-  const frameClass = (frame && FRAME_STYLES[frame]) ?? "border-black/40";
-  const glowClass = (aura && AURA_STYLES[aura]) ?? "sprite-glow";
+  const companion = companionId ? findShopItem(companionId, shopStock) : null;
+  const frameClass =
+    (frame && (FRAME_STYLES[frame] ?? findShopItem(frame, shopStock)?.style)) ?? "border-black/40";
+  const glowClass =
+    (aura && (AURA_STYLES[aura] ?? findShopItem(aura, shopStock)?.style)) ?? "sprite-glow";
 
   // Daylight 6am to 7pm; night art otherwise. Defaults to night pre-hydration.
   const hour = now?.getHours() ?? 21;

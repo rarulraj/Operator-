@@ -33,6 +33,8 @@ export default async function DashboardPage() {
         streak={state.streak.current}
         questDoneToday={quest.status === "completed"}
         inventory={state.inventory}
+        rankTiers={state.rankTiers}
+        shopStock={state.shopStock}
       />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">

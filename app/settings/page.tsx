@@ -10,7 +10,7 @@ import { loadSituation } from "@/lib/ai/situation";
 import { getManualSituation, getOpenAiKeySource, maskedKey } from "@/lib/config";
 import { allWeeks } from "@/lib/curriculum";
 import { getStore } from "@/lib/store";
-import { RANKS } from "@/lib/xp";
+import { ranksFor } from "@/lib/xp";
 
 export const dynamic = "force-dynamic";
 
@@ -81,7 +81,7 @@ export default async function SettingsPage() {
       <Card className="animate-fade-up">
         <CardHeader title="Rank Ladder" icon={<CheckCircle2 size={14} className="text-zinc-500" />} />
         <div className="grid grid-cols-2 gap-1.5 px-5 pb-5 pt-2 sm:grid-cols-4">
-          {RANKS.map((r) => (
+          {ranksFor(state.rankTiers).map((r) => (
             <div
               key={r.title}
               className="rounded-lg border border-ink-800 bg-ink-850/40 px-3 py-2"

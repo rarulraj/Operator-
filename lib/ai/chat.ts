@@ -29,7 +29,7 @@ function noteLine(note: AppState["notes"][number]): string {
 function stateSummary(state: AppState): string {
   const xp = totalXp(state);
   const lvl = levelFromXp(xp);
-  const rank = rankFromXp(xp);
+  const rank = rankFromXp(xp, state.rankTiers ?? []);
 
   const pillars = Object.values(CATEGORY_MAP)
     .map((c) => {

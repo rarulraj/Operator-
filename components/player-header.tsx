@@ -1,7 +1,7 @@
 import { Coins, Flame, Shield } from "lucide-react";
-import { SHOP_ITEM_MAP } from "@/lib/shop";
+import { findShopItem, type ShopItem } from "@/lib/shop";
 import type { Inventory } from "@/lib/types";
-import { formatXp, levelFromXp, nextRank, rankFromXp } from "@/lib/xp";
+import { formatXp, levelFromXp, nextRank, rankFromXp, type Rank } from "@/lib/xp";
 import { Character } from "./character";
 import { Card, Progress } from "./ui";
 
@@ -11,18 +11,22 @@ export function PlayerHeader({
   streak,
   questDoneToday,
   inventory,
+  rankTiers = [],
+  shopStock = [],
 }: {
   name: string;
   totalXp: number;
   streak: number;
   questDoneToday: boolean;
   inventory: Inventory;
+  rankTiers?: Rank[];
+  shopStock?: ShopItem[];
 }) {
   const lvl = levelFromXp(totalXp);
-  const rank = rankFromXp(totalXp);
-  const upcoming = nextRank(totalXp);
+  const rank = rankFromXp(totalXp, rankTiers);
+  const upcoming = nextRank(totalXp, rankTiers);
   const titleId = inventory.equipped.find((id) => id.startsWith("title-"));
-  const title = titleId ? SHOP_ITEM_MAP[titleId]?.titleText : null;
+  const title = titleId ? findShopItem(titleId, shopStock)?.titleText : null;
 
   return (
     <Card className="animate-fade-up px-6 py-5">
@@ -33,6 +37,8 @@ export function PlayerHeader({
             streak={streak}
             questDoneToday={questDoneToday}
             inventory={inventory}
+            rankTiers={rankTiers}
+            shopStock={shopStock}
           />
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-3">

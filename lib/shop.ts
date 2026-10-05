@@ -562,11 +562,125 @@ export const SHOP_ITEMS: ShopItem[] = [
     type: "backdrop",
     style: "bg-[#140c1c]",
   },
+
+  // ── Restock: the shelf that shows up after the first catalog ──
+  {
+    id: "frame-barnlight",
+    name: "Barnlight Frame",
+    description: "A lamp-warm edge. For the hour after the gym.",
+    cost: 460,
+    type: "frame",
+    style: "border-[#e8c07a] shadow-[3px_3px_0_0_rgba(232,192,122,0.4)]",
+  },
+  {
+    id: "frame-ledger",
+    name: "Ledger Frame",
+    description: "Ink-green trim. The promotion packet, framed.",
+    cost: 540,
+    type: "frame",
+    style: "border-[#6f8f62] shadow-[3px_3px_0_0_rgba(111,143,98,0.45)]",
+  },
+  {
+    id: "frame-signal",
+    name: "Signal Frame",
+    description: "A thin red wire of a border. Something shipped.",
+    cost: 680,
+    type: "frame",
+    style: "border-[#e85d4c] shadow-[3px_3px_0_0_rgba(232,93,76,0.4)]",
+  },
+  {
+    id: "aura-lantern",
+    name: "Lantern Aura",
+    description: "Porch light. Visible, not loud.",
+    cost: 560,
+    type: "aura",
+    style: "aura-harvest",
+  },
+  {
+    id: "aura-wire",
+    name: "Wire Aura",
+    description: "A live circuit. For the night you actually publish.",
+    cost: 640,
+    type: "aura",
+    style: "aura-static",
+  },
+  {
+    id: "companion-raccoon",
+    name: "Bin Raccoon",
+    description: "Sorts the board at night. Steals nothing important.",
+    cost: 380,
+    type: "companion",
+    glyph: "🦝",
+  },
+  {
+    id: "companion-hedgehog",
+    name: "Hedge Hog",
+    description: "Small, bristly, does not skip the streak.",
+    cost: 340,
+    type: "companion",
+    glyph: "🦔",
+  },
+  {
+    id: "companion-duck",
+    name: "Pond Duck",
+    description: "Looks calm. Is counting your unfinished tasks.",
+    cost: 240,
+    type: "companion",
+    glyph: "🦆",
+  },
+  {
+    id: "title-compounder",
+    name: "Title: Compounder",
+    description: "Shown under your name. The long game, worn out loud.",
+    cost: 520,
+    type: "title",
+    titleText: "Compounder",
+  },
+  {
+    id: "title-historian",
+    name: "Title: Historian",
+    description: "Shown under your name. The person who writes the day down.",
+    cost: 300,
+    type: "title",
+    titleText: "Historian",
+  },
+  {
+    id: "backdrop-booth",
+    name: "Booth Night",
+    description: "Warm dark. The hall after the demos.",
+    cost: 420,
+    type: "backdrop",
+    style: "bg-[#1a1408]",
+  },
+  {
+    id: "backdrop-ledger",
+    name: "Ledger Green",
+    description: "Dark field green. Evidence, not noise.",
+    cost: 380,
+    type: "backdrop",
+    style: "bg-[#101610]",
+  },
 ];
 
 export const SHOP_ITEM_MAP: Record<string, ShopItem> = Object.fromEntries(
   SHOP_ITEMS.map((i) => [i.id, i]),
 );
+
+/** Static catalog plus shelves generated later. Generated ids never replace a stock item. */
+export function shopCatalog(extra: ShopItem[] = []): ShopItem[] {
+  const byId = new Map<string, ShopItem>();
+  for (const item of SHOP_ITEMS) byId.set(item.id, item);
+  for (const item of extra) {
+    if (!item?.id || byId.has(item.id)) continue;
+    if (!item.name || !item.type || !Number.isFinite(item.cost)) continue;
+    byId.set(item.id, item);
+  }
+  return [...byId.values()];
+}
+
+export function findShopItem(id: string, extra: ShopItem[] = []): ShopItem | undefined {
+  return SHOP_ITEM_MAP[id] ?? extra.find((item) => item.id === id);
+}
 
 export const FRAME_STYLES: Record<string, string> = Object.fromEntries(
   SHOP_ITEMS.filter((i) => i.type === "frame" && i.style).map((i) => [

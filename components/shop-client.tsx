@@ -4,7 +4,7 @@ import { Check, Coins, Search, Store } from "lucide-react";
 import { useMemo, useState, useTransition } from "react";
 import { buyItemAction, equipItemAction } from "@/app/actions";
 import { CompanionMark } from "@/components/character";
-import { SHOP_ITEMS, type ShopItem, type ShopItemType } from "@/lib/shop";
+import { type ShopItem, type ShopItemType } from "@/lib/shop";
 import type { Inventory } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Card } from "./ui";
@@ -140,9 +140,11 @@ function ShopItemCard({ item, inventory }: { item: ShopItem; inventory: Inventor
 export function ShopClient({
   inventory,
   totalXp,
+  items,
 }: {
   inventory: Inventory;
   totalXp: number;
+  items: ShopItem[];
 }) {
   void totalXp;
   const [query, setQuery] = useState("");
@@ -150,15 +152,15 @@ export function ShopClient({
   const catalog = useMemo(
     () =>
       q
-        ? SHOP_ITEMS.filter(
+        ? items.filter(
             (i) =>
               i.name.toLowerCase().includes(q) ||
               i.description.toLowerCase().includes(q) ||
               i.type.includes(q) ||
               (i.titleText ?? "").toLowerCase().includes(q),
           )
-        : SHOP_ITEMS,
-    [q],
+        : items,
+    [q, items],
   );
 
   return (
@@ -171,7 +173,7 @@ export function ShopClient({
           <span className="tnum">{inventory.gold}</span>
         </span>
         <span className="text-[11px] uppercase tracking-wider text-zinc-600">
-          {SHOP_ITEMS.length} in stock · {inventory.owned.length} owned
+          {items.length} in stock · {inventory.owned.length} owned
         </span>
       </Card>
 

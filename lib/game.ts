@@ -1,7 +1,7 @@
 import { loadSituation, questMismatchesSituation } from "./ai/situation";
 import { buildPersonalQuest, isGenericQuest, JOURNAL_TASK } from "./daily-quest";
 import { applyXpDelta, normalizeXpEvent } from "./ledger";
-import { GOLD_REWARDS, SHOP_ITEM_MAP } from "./shop";
+import { GOLD_REWARDS, findShopItem, shopCatalog } from "./shop";
 import { defaultSkillForCategory, SKILL_DEF_MAP } from "./skills";
 import { getStore } from "./store";
 import { dateKey } from "./store/types";
@@ -643,10 +643,10 @@ export async function toggleTodo(todoId: string): Promise<void> {
 export async function buyItem(
   itemId: string,
 ): Promise<{ ok: boolean; error?: string }> {
-  const item = SHOP_ITEM_MAP[itemId];
-  if (!item) return { ok: false, error: "Unknown item." };
   const store = getStore();
   const state = await store.getState();
+  const item = findShopItem(itemId, state.shopStock ?? []);
+  if (!item) return { ok: false, error: "Unknown item." };
   if (state.inventory.owned.includes(itemId)) return { ok: false, error: "Already owned." };
   if (state.inventory.gold < item.cost) return { ok: false, error: "Not enough gold." };
   await store.saveInventory({
@@ -663,21 +663,19 @@ export async function equipItem(
   itemId: string,
   equip: boolean,
 ): Promise<{ ok: boolean; error?: string }> {
-  const item = SHOP_ITEM_MAP[itemId];
-  if (!item) return { ok: false, error: "Unknown item." };
   const store = getStore();
   const state = await store.getState();
+  const item = findShopItem(itemId, state.shopStock ?? []);
+  if (!item) return { ok: false, error: "Unknown item." };
   const { owned, equipped } = state.inventory;
   if (!owned.includes(itemId)) return { ok: false, error: "You don't own that yet." };
 
   let next: string[];
   if (equip) {
     const sameType = new Set(
-      SHOP_ITEM_MAP
-        ? Object.values(SHOP_ITEM_MAP)
-            .filter((i) => i.type === item.type)
-            .map((i) => i.id)
-        : [],
+      shopCatalog(state.shopStock ?? [])
+        .filter((i) => i.type === item.type)
+        .map((i) => i.id),
     );
     next = [...equipped.filter((id) => !sameType.has(id)), itemId];
   } else {

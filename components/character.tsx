@@ -1,12 +1,12 @@
 import {
   AURA_STYLES,
   BACKDROP_STYLES,
+  findShopItem,
   FRAME_STYLES,
-  SHOP_ITEM_MAP,
   type ShopItem,
 } from "@/lib/shop";
 import type { Inventory } from "@/lib/types";
-import { rankFromXp } from "@/lib/xp";
+import { rankFromXp, type Rank } from "@/lib/xp";
 
 export { AURA_STYLES, FRAME_STYLES };
 
@@ -72,28 +72,37 @@ export function Character({
   questDoneToday,
   size = 88,
   inventory,
+  rankTiers = [],
+  shopStock = [],
 }: {
   totalXp: number;
   streak: number;
   questDoneToday: boolean;
   size?: number;
   inventory?: Inventory;
+  rankTiers?: Rank[];
+  shopStock?: ShopItem[];
 }) {
-  const rank = rankFromXp(totalXp);
-  const stage = STAGE_BY_RANK[rank.title] ?? STAGE_BY_RANK.Apprentice;
+  const rank = rankFromXp(totalXp, rankTiers);
+  const stage =
+    STAGE_BY_RANK[rank.title] ??
+    (rank.minXp >= 10450 ? STAGE_BY_RANK["Master Operator"] : STAGE_BY_RANK.Apprentice);
 
   const equipped = inventory?.equipped ?? [];
   const frame = equipped.find((id) => id.startsWith("frame-"));
   const aura = equipped.find((id) => id.startsWith("aura-"));
   const companionId = equipped.find((id) => id.startsWith("companion-"));
-  const companion = companionId ? SHOP_ITEM_MAP[companionId] : null;
+  const companion = companionId ? findShopItem(companionId, shopStock) : null;
   const backdrop = equipped.find((id) => id.startsWith("backdrop-"));
 
   const frameClass =
-    (frame && FRAME_STYLES[frame]) ??
+    (frame && (FRAME_STYLES[frame] ?? findShopItem(frame, shopStock)?.style)) ??
     "border-ink-600/70 shadow-[3px_3px_0_0_rgba(0,0,0,0.35)]";
-  const glowClass = (aura && AURA_STYLES[aura]) ?? "sprite-glow";
-  const fillClass = (backdrop && BACKDROP_STYLES[backdrop]) ?? "bg-[#17110c]";
+  const glowClass =
+    (aura && (AURA_STYLES[aura] ?? findShopItem(aura, shopStock)?.style)) ?? "sprite-glow";
+  const fillClass =
+    (backdrop && (BACKDROP_STYLES[backdrop] ?? findShopItem(backdrop, shopStock)?.style)) ??
+    "bg-[#17110c]";
 
   return (
     <div className="flex items-center gap-4">

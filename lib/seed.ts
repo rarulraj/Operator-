@@ -512,6 +512,8 @@ export function buildSeedState(withSampleData: boolean, now: Date = new Date()):
     chat: [],
     contextNotes: [],
     customWeeks: [],
+    rankTiers: [],
+    shopStock: [],
     streak: withSampleData
       ? {
           current: 4,

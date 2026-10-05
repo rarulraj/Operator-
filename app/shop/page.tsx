@@ -1,5 +1,6 @@
 import { ShopClient } from "@/components/shop-client";
 import { totalXp } from "@/lib/game";
+import { shopCatalog } from "@/lib/shop";
 import { getStore } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
@@ -12,12 +13,16 @@ export default async function ShopPage() {
       <div>
         <h1 className="text-xl font-semibold tracking-tight text-zinc-50">Shop</h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Pierre&apos;s restocked. Gold from real work buys frames, auras,
-          companions, titles, and portrait backdrops. Style only: power still
-          comes from XP.
+          Pierre restocks. Gold from real work buys frames, auras, companions,
+          titles, and backdrops. When the shelf thins, another one is written.
+          Style only: power still comes from XP.
         </p>
       </div>
-      <ShopClient inventory={state.inventory} totalXp={totalXp(state)} />
+      <ShopClient
+        inventory={state.inventory}
+        totalXp={totalXp(state)}
+        items={shopCatalog(state.shopStock)}
+      />
     </div>
   );
 }

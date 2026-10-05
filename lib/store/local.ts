@@ -81,6 +81,8 @@ export class LocalStore implements Store {
     if (!Array.isArray(state.chat)) state.chat = [];
     if (!Array.isArray(state.contextNotes)) state.contextNotes = [];
     if (!Array.isArray(state.customWeeks)) state.customWeeks = [];
+    if (!Array.isArray(state.rankTiers)) state.rankTiers = [];
+    if (!Array.isArray(state.shopStock)) state.shopStock = [];
     if (!Array.isArray(state.weightEntries)) state.weightEntries = [];
     state.weightEntries = state.weightEntries.filter(
       (e) =>

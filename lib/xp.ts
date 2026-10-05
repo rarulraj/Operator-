@@ -57,16 +57,28 @@ export const RANKS: Rank[] = [
   { title: "Master Operator", minXp: 10450 },
 ];
 
-export function rankFromXp(xp: number): Rank {
+/** Base ladder plus any tiers written later. Later tiers never replace a base rank. */
+export function ranksFor(extra: Rank[] = []): Rank[] {
+  const byXp = new Map<number, Rank>();
+  for (const rank of RANKS) byXp.set(rank.minXp, rank);
+  for (const rank of extra) {
+    if (!byXp.has(rank.minXp) && rank.title.trim() && rank.minXp > 0) {
+      byXp.set(rank.minXp, { title: rank.title.trim(), minXp: rank.minXp });
+    }
+  }
+  return [...byXp.values()].sort((a, b) => a.minXp - b.minXp);
+}
+
+export function rankFromXp(xp: number, extra: Rank[] = []): Rank {
   let current = RANKS[0];
-  for (const rank of RANKS) {
+  for (const rank of ranksFor(extra)) {
     if (xp >= rank.minXp) current = rank;
   }
   return current;
 }
 
-export function nextRank(xp: number): Rank | null {
-  for (const rank of RANKS) {
+export function nextRank(xp: number, extra: Rank[] = []): Rank | null {
+  for (const rank of ranksFor(extra)) {
     if (xp < rank.minXp) return rank;
   }
   return null;

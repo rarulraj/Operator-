@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { HelperDock } from "@/components/helper-dock";
 import { NavProgress } from "@/components/nav-progress";
 import { Sidebar } from "@/components/sidebar";
+import { ensureProgression } from "@/lib/progression";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -30,7 +31,8 @@ export const viewport: Viewport = {
   themeColor: "#161009",
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  await ensureProgression();
   return (
     <html lang="en" className={`${inter.variable} ${mono.variable} ${pixel.variable}`}>
       <body>
