@@ -28,7 +28,22 @@ import {
 import { getStore } from "@/lib/store";
 import { dateKey } from "@/lib/store/types";
 import { blankNote, blankFolder } from "@/lib/notes";
-import type { CategoryId, ClassifiedActivity, NoteFolder, NoteItem, TrackableCategory } from "@/lib/types";
+import type {
+  CategoryId,
+  ClassifiedActivity,
+  NoteFolder,
+  NoteItem,
+  TrackableCategory,
+  WeightEntry,
+  WeightUnit,
+} from "@/lib/types";
+import {
+  isValidDateKey,
+  roundWeight,
+  toUnit,
+  WEIGHT_LIMITS,
+  weightInRange,
+} from "@/lib/weight";
 
 function revalidateAll() {
   revalidatePath("/", "layout");
@@ -62,6 +77,88 @@ export async function confirmActivityLogAction(input: {
   );
   revalidateAll();
   return { ok: true, totalXp: log.totalXp };
+}
+
+// ── Daily weight ────────────────────────────────────────────────────────────
+
+export async function saveWeightAction(input: {
+  date: string;
+  weight: number;
+  note?: string;
+}): Promise<{ ok: true } | { ok: false; error: string }> {
+  const store = getStore();
+  if (!store.mutate) return { ok: false, error: "Could not save." };
+  const today = dateKey(new Date());
+  const date = input.date;
+  if (!isValidDateKey(date)) return { ok: false, error: "Pick a real date." };
+  if (date > today) return { ok: false, error: "That date hasn't happened yet." };
+  const note = (input.note ?? "").trim().slice(0, 200);
+  const state = await store.getState();
+  const unit = state.weightUnit;
+  const weight = roundWeight(Number(input.weight));
+  if (!weightInRange(weight, unit)) {
+    const { min, max } = WEIGHT_LIMITS[unit];
+    return { ok: false, error: `Enter a weight between ${min} and ${max} ${unit}.` };
+  }
+  await store.mutate((s) => {
+    const entry: WeightEntry = {
+      date,
+      weight,
+      unit: s.weightUnit,
+      note,
+      updatedAt: new Date().toISOString(),
+    };
+    const idx = s.weightEntries.findIndex((e) => e.date === date);
+    if (idx >= 0) s.weightEntries[idx] = entry;
+    else s.weightEntries.push(entry);
+  });
+  revalidateAll();
+  return { ok: true };
+}
+
+export async function deleteWeightAction(
+  date: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const store = getStore();
+  if (!store.mutate) return { ok: false, error: "Could not delete." };
+  if (!isValidDateKey(date)) return { ok: false, error: "Unknown date." };
+  await store.mutate((s) => {
+    s.weightEntries = s.weightEntries.filter((e) => e.date !== date);
+  });
+  revalidateAll();
+  return { ok: true };
+}
+
+export async function setWeightPrefsAction(input: {
+  unit?: WeightUnit;
+  goal?: number | null;
+}): Promise<{ ok: true } | { ok: false; error: string }> {
+  const store = getStore();
+  if (!store.mutate) return { ok: false, error: "Could not save." };
+  if (input.unit && input.unit !== "lb" && input.unit !== "kg") {
+    return { ok: false, error: "Unit must be lb or kg." };
+  }
+  if (input.goal != null) {
+    const state = await store.getState();
+    const unit = input.unit ?? state.weightUnit;
+    const goal = roundWeight(Number(input.goal));
+    if (!weightInRange(goal, unit)) {
+      const { min, max } = WEIGHT_LIMITS[unit];
+      return { ok: false, error: `Goal must be between ${min} and ${max} ${unit}.` };
+    }
+  }
+  await store.mutate((s) => {
+    if (input.unit && input.unit !== s.weightUnit) {
+      if (s.weightGoal != null) {
+        s.weightGoal = roundWeight(toUnit(s.weightGoal, s.weightUnit, input.unit));
+      }
+      s.weightUnit = input.unit;
+    }
+    if (input.goal === null) s.weightGoal = null;
+    else if (input.goal != null) s.weightGoal = roundWeight(Number(input.goal));
+  });
+  revalidateAll();
+  return { ok: true };
 }
 
 // ── Quests ──────────────────────────────────────────────────────────────────

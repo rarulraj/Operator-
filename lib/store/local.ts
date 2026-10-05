@@ -81,6 +81,23 @@ export class LocalStore implements Store {
     if (!Array.isArray(state.chat)) state.chat = [];
     if (!Array.isArray(state.contextNotes)) state.contextNotes = [];
     if (!Array.isArray(state.customWeeks)) state.customWeeks = [];
+    if (!Array.isArray(state.weightEntries)) state.weightEntries = [];
+    state.weightEntries = state.weightEntries.filter(
+      (e) =>
+        !!e &&
+        typeof e.date === "string" &&
+        typeof e.weight === "number" &&
+        Number.isFinite(e.weight) &&
+        (e.unit === "lb" || e.unit === "kg"),
+    );
+    for (const entry of state.weightEntries) {
+      if (typeof entry.note !== "string") entry.note = "";
+      if (typeof entry.updatedAt !== "string") entry.updatedAt = new Date().toISOString();
+    }
+    if (state.weightUnit !== "lb" && state.weightUnit !== "kg") state.weightUnit = "lb";
+    if (typeof state.weightGoal !== "number" || !Number.isFinite(state.weightGoal)) {
+      state.weightGoal = null;
+    }
     // Backfill skills added after the player's save was created
     for (const def of SKILL_DEFS) {
       if (!state.skills.some((s) => s.id === def.id)) {

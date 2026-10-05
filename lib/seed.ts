@@ -521,5 +521,8 @@ export function buildSeedState(withSampleData: boolean, now: Date = new Date()):
         }
       : { current: 0, longest: 0, lastCompletionDate: null, activeDates: [] },
     campaign: { currentWeek: 1, currentDay: 1, completedDays: [], version: 2 },
+    weightEntries: [],
+    weightUnit: "lb",
+    weightGoal: null,
   };
 }

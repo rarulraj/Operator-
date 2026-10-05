@@ -1,7 +1,9 @@
 import { CATEGORY_MAP } from "../skills";
 import { totalXp } from "../game";
+import { dateKey } from "../store/types";
 import { todoNotes } from "../todos";
 import type { AppState } from "../types";
+import { formatDay, formatDelta, formatWeight, snapshot } from "../weight";
 import { levelFromXp, rankFromXp } from "../xp";
 import { coachSystemPrompt, getOpenAI, openAiModel } from "./openai";
 import { loadSituation } from "./situation";
@@ -80,6 +82,16 @@ function stateSummary(state: AppState): string {
     .map((n) => (n.fileName ? `[${n.fileName}] ${n.text.slice(0, 160)}` : n.text.slice(0, 160)))
     .join("\n");
 
+  const weigh = snapshot(
+    state.weightEntries ?? [],
+    state.weightUnit ?? "lb",
+    state.weightGoal ?? null,
+    dateKey(new Date()),
+  );
+  const weightLine = weigh.latest
+    ? `Body weight: ${formatWeight(weigh.latest.weight, weigh.unit)} on ${weigh.latest.date}${weigh.delta != null ? ` (${formatDelta(weigh.delta, weigh.unit)} vs prior)` : ""}. ${weigh.loggedToday ? "Logged today." : "Not logged today."}${weigh.goal != null ? ` Goal ${formatWeight(weigh.goal, weigh.unit)}.` : ""}`
+    : "Body weight: nothing logged yet. Page: Weight.";
+
   return [
     `Level ${lvl.level} (${rank.title}), ${xp} total XP, ${state.streak.current}-day streak, ${state.inventory.gold} gold.`,
     `Pillar XP: ${pillars}`,
@@ -89,6 +101,7 @@ function stateSummary(state: AppState): string {
     `Open tasks:\n${openTasks || "none"}`,
     `Notes:\n${notes || "none"}`,
     `Remembered context:\n${remembered || "none"}`,
+    weightLine,
     `Recent activity:\n${recentLogs || "nothing logged yet"}`,
   ]
     .filter(Boolean)
@@ -103,6 +116,22 @@ function heuristicReply(state: AppState, message: string): string {
   const openTasks = state.todos.filter((t) => !t.completed);
   const activeMissions = state.missions.filter((m) => m.status === "active");
 
+  if (/\b(weight|weigh-?in)\b/.test(lower)) {
+    if (/\b(how|where|page)\b/.test(lower)) return appHelp("weight", state);
+    const weigh = snapshot(
+      state.weightEntries ?? [],
+      state.weightUnit ?? "lb",
+      state.weightGoal ?? null,
+      dateKey(new Date()),
+    );
+    if (!weigh.latest) {
+      return "No weigh-ins yet. Open Weight in the sidebar, or type today's number on the dashboard card. One entry per day.";
+    }
+    const delta = weigh.delta != null ? ` ${formatDelta(weigh.delta, weigh.unit)} versus the prior entry.` : "";
+    const goal =
+      weigh.goal != null ? ` Goal is ${formatWeight(weigh.goal, weigh.unit)}.` : "";
+    return `Latest weigh-in: ${formatWeight(weigh.latest.weight, weigh.unit)} on ${formatDay(weigh.latest.date)}.${delta}${goal} ${weigh.loggedToday ? "Today is already logged." : "Today is not logged yet."}`;
+  }
   if (/\b(streak)\b/.test(lower)) {
     return `You're on a ${state.streak.current}-day streak (longest: ${state.streak.longest}). The streak only counts if something real ships today: a task, a log, or the quest.`;
   }
@@ -149,6 +178,9 @@ function appHelp(lower: string, state: AppState): string {
   if (/journal|log|activit/.test(lower)) {
     return "Activity Log is the journal. Write what actually happened; the coach classifies it into skills and XP. The same journal beat sits on today's quest.";
   }
+  if (/weight|weigh-?in/.test(lower)) {
+    return "Weight is the daily scale log in the sidebar. One entry per date: pick the day, type the number, save. lb and kg switch at the top of that page, and old entries convert for display. Set a goal and the chart draws the line. The dashboard card logs today without opening the page.";
+  }
   if (/mission|boss/.test(lower)) {
     return "Missions are the long goals. Assign tasks to a mission from the board. Completing those tasks nudges progress; only you can mark a mission done.";
   }
@@ -167,6 +199,7 @@ You also know the product:
 - Tasks: chore board (rename, pin, per-task notes, board brief)
 - Notes: scratchpad; checklist icon makes a task
 - Activity Log: journal that awards XP
+- Weight: one scale reading per day, with a trend chart and optional goal. The dashboard card logs today.
 - Missions: long goals; tasks can attach
 - Shop / Idle: cosmetics and the screensaver
 - AI Chat: the long thread; this Helper is the short one

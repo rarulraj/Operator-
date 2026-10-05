@@ -10,6 +10,7 @@ import {
   Network,
   Waypoints,
   PenLine,
+  Scale,
   ScrollText,
   Settings,
   ShoppingBag,
@@ -31,6 +32,7 @@ const NAV = [
   { href: "/missions", label: "Missions", icon: Swords },
   { href: "/shop", label: "Shop", icon: ShoppingBag },
   { href: "/log", label: "Activity Log", icon: PenLine },
+  { href: "/weight", label: "Weight", icon: Scale },
   { href: "/notes", label: "Notes", icon: StickyNote },
   { href: "/chat", label: "AI Chat", icon: MessageSquare },
   { href: "/insights", label: "Insights", icon: BarChart3 },
@@ -108,7 +110,7 @@ export function Sidebar() {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-ink-800 bg-ink-900/85 md:flex">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col overflow-y-auto border-r border-ink-800 bg-ink-900/85 md:flex">
         <Wordmark />
         <NavLinks />
       </aside>

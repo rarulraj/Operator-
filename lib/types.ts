@@ -179,6 +179,17 @@ export interface ContextNote {
   fileName?: string;
 }
 
+export type WeightUnit = "lb" | "kg";
+
+/** One scale reading per calendar day. `weight` is stored in `unit`. */
+export interface WeightEntry {
+  date: string; // YYYY-MM-DD
+  weight: number;
+  unit: WeightUnit;
+  note: string;
+  updatedAt: string;
+}
+
 export interface AppState {
   playerName: string;
   skills: Skill[];
@@ -197,6 +208,12 @@ export interface AppState {
   campaign: CampaignProgress;
   /** AI/rule-generated campaign weeks beyond the static Season 1 curriculum. */
   customWeeks: CurriculumWeek[];
+  /** Daily scale log. One entry per date. */
+  weightEntries: WeightEntry[];
+  /** Display unit. Entries keep the unit they were logged in. */
+  weightUnit: WeightUnit;
+  /** Target weight in `weightUnit`. Null until set. */
+  weightGoal: number | null;
 }
 
 // ── Curriculum (12-week campaign) ───────────────────────────────────────────

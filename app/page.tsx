@@ -7,11 +7,13 @@ import { QuestCard } from "@/components/quest-card";
 import { SkillGrowth } from "@/components/skill-growth";
 import { TaskBriefPanel } from "@/components/task-brief";
 import { TasksClient } from "@/components/tasks-client";
+import { WeightCard } from "@/components/weight-client";
 import { coachRecommendations } from "@/lib/ai/coach";
 import { summarizeBoard } from "@/lib/ai/task-brief";
 import { ensureTodayQuest, totalXp } from "@/lib/game";
 import { CATEGORIES } from "@/lib/skills";
 import { getStore } from "@/lib/store";
+import { dateKey } from "@/lib/store/types";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +48,12 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <QuestCard quest={quest} />
         <div className="space-y-4">
+          <WeightCard
+            today={dateKey(new Date())}
+            unit={state.weightUnit}
+            goal={state.weightGoal}
+            entries={state.weightEntries}
+          />
           <TaskBriefPanel initial={brief} />
           <TasksClient
             todos={[...state.todos].sort(
