@@ -68,6 +68,7 @@ const BACKDROPS = [
   "bg-[#140e18]",
 ];
 const GLYPHS = ["🐿️", "🦡", "🦢", "🦉", "🐝", "🐢", "🦊", "🐺", "🐐", "🐸"];
+const UPGRADE_GLYPHS = ["⚔️", "🛡️", "🧪", "🪙", "🧭", "🏮", "👑", "🚩"];
 const TITLE_WORDS = [
   "Warden",
   "Pilot",
@@ -78,7 +79,7 @@ const TITLE_WORDS = [
   "Ranger",
   "Partner",
 ];
-const TYPES: ShopItemType[] = ["frame", "aura", "companion", "title", "backdrop"];
+const TYPES: ShopItemType[] = ["upgrade", "frame", "aura", "companion", "title", "backdrop"];
 
 function roman(n: number): string {
   const map: [number, string][] = [
@@ -184,6 +185,15 @@ function proceduralShelf(existingIds: Set<string>, wave: number): ShopItem[] {
         type,
         titleText,
       });
+    } else if (type === "upgrade") {
+      items.push({
+        id,
+        name: `Shelf Gear ${mark}`,
+        description: "Another piece of kit. Shows on the portrait. No extra XP.",
+        cost,
+        type,
+        glyph: UPGRADE_GLYPHS[mark % UPGRADE_GLYPHS.length],
+      });
     } else {
       items.push({
         id,
@@ -241,10 +251,10 @@ async function aiShelf(wave: number, previousNames: string[]): Promise<ShopItem[
       {
         role: "user",
         content: `Restock Pierre's shop in Operator, a farm-quiet personal RPG. Write ${BATCH} new cosmetics. Already stocked: ${previousNames.slice(-24).join(", ") || "the first catalog"}.
-Types, one each if you can: frame, aura, companion, title, backdrop.
+Types, one each if you can: upgrade, frame, aura, companion, title, backdrop.
 Voice: short, dry, specific. Not generic fantasy. Costs between ${600 + wave * 100} and ${1400 + wave * 200}.
-For companions include a single emoji glyph. For titles include titleText (the words under the name).
-Return JSON: { "items": [{ "name": string, "description": string, "cost": number, "type": "frame"|"aura"|"companion"|"title"|"backdrop", "titleText"?: string, "glyph"?: string }] }`,
+Upgrades are wearable gear (a tool, trophy, or trinket) with a single emoji glyph. Companions also need a glyph. Titles include titleText (the words under the name).
+Return JSON: { "items": [{ "name": string, "description": string, "cost": number, "type": "upgrade"|"frame"|"aura"|"companion"|"title"|"backdrop", "titleText"?: string, "glyph"?: string }] }`,
       },
     ],
   });
@@ -255,7 +265,14 @@ Return JSON: { "items": [{ "name": string, "description": string, "cost": number
     if (!raw || typeof raw !== "object") return;
     const rec = raw as Record<string, unknown>;
     const type = rec.type;
-    if (type !== "frame" && type !== "aura" && type !== "companion" && type !== "title" && type !== "backdrop") {
+    if (
+      type !== "upgrade" &&
+      type !== "frame" &&
+      type !== "aura" &&
+      type !== "companion" &&
+      type !== "title" &&
+      type !== "backdrop"
+    ) {
       return;
     }
     const name = typeof rec.name === "string" ? rec.name.trim().slice(0, 42) : "";
@@ -272,8 +289,9 @@ Return JSON: { "items": [{ "name": string, "description": string, "cost": number
     if (type === "frame") item.style = FRAME_STYLES[index % FRAME_STYLES.length];
     if (type === "aura") item.style = AURA_STYLES[index % AURA_STYLES.length];
     if (type === "backdrop") item.style = BACKDROPS[index % BACKDROPS.length];
-    if (type === "companion") {
-      item.glyph = typeof rec.glyph === "string" && rec.glyph.trim() ? rec.glyph.trim().slice(0, 4) : GLYPHS[index % GLYPHS.length];
+    if (type === "companion" || type === "upgrade") {
+      const fallback = type === "upgrade" ? UPGRADE_GLYPHS : GLYPHS;
+      item.glyph = typeof rec.glyph === "string" && rec.glyph.trim() ? rec.glyph.trim().slice(0, 4) : fallback[index % fallback.length];
     }
     if (type === "title") {
       const titleText = typeof rec.titleText === "string" ? rec.titleText.trim().slice(0, 24) : name.replace(/^title:\s*/i, "");

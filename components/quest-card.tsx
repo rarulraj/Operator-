@@ -13,7 +13,7 @@ export function QuestCard({ quest }: { quest: DailyQuest }) {
   return (
     <Card className="animate-fade-up">
       <CardHeader
-        title="Today's Quest"
+        title="Journal"
         icon={<ScrollText size={14} className="text-zinc-500" />}
         action={
           <Link

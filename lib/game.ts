@@ -1,5 +1,11 @@
-import { loadSituation, questMismatchesSituation } from "./ai/situation";
-import { buildPersonalQuest, isGenericQuest, JOURNAL_TASK } from "./daily-quest";
+import { loadSituation } from "./ai/situation";
+import {
+  buildPersonalQuest,
+  collapseToJournal,
+  isGenericQuest,
+  isJournalOnly,
+  JOURNAL_TASK,
+} from "./daily-quest";
 import { applyXpDelta, normalizeXpEvent } from "./ledger";
 import { GOLD_REWARDS, findShopItem, shopCatalog } from "./shop";
 import { defaultSkillForCategory, SKILL_DEF_MAP } from "./skills";
@@ -37,9 +43,8 @@ async function awardGold(amount: number): Promise<void> {
   await store.saveInventory({ ...state.inventory, gold });
 }
 
-/** Today's quest is built from Arun's board, missions, and weekday :
- *  not from the old discovery curriculum. Generic leftover quests are
- *  replaced in place so the day is never a worksheet. */
+/** Today's beat is the journal. Older generated task lists collapse to it
+ *  until the day is already banked. */
 export async function ensureTodayQuest(state: AppState): Promise<DailyQuest> {
   const today = dateKey(new Date());
   const store = getStore();
@@ -47,15 +52,7 @@ export async function ensureTodayQuest(state: AppState): Promise<DailyQuest> {
 
   // Fast path: a good quest already exists in the snapshot we were handed.
   const snapshot = state.quests.find((q) => q.date === today);
-  const snapshotUntouched = snapshot?.tasks.every((t) => !t.completed) ?? false;
-  if (
-    snapshot &&
-    (snapshot.status === "completed" ||
-      (!isGenericQuest(snapshot) &&
-        snapshot.tasks.some((t) => t.title === JOURNAL_TASK) &&
-        snapshot.rewardXp === 80 + snapshot.tasks.length * 20 &&
-        !(snapshotUntouched && questMismatchesSituation(snapshot, situation))))
-  ) {
+  if (snapshot && (snapshot.status === "completed" || isJournalOnly(snapshot))) {
     return snapshot;
   }
 
@@ -88,38 +85,15 @@ export async function ensureTodayQuest(state: AppState): Promise<DailyQuest> {
       return;
     }
 
-    const untouched = current?.tasks.every((t) => !t.completed) ?? false;
-    if (
-      !current ||
-      isGenericQuest(current) ||
-      (untouched && questMismatchesSituation(current, situation))
-    ) {
-      const built = buildPersonalQuest(live, new Date(), situation);
-      built.date = today;
-      if (current) {
-        built.id = current.id;
-        live.quests[live.quests.findIndex((q) => q.id === current!.id)] = built;
-      } else {
+    if (!current || isGenericQuest(current) || !isJournalOnly(current)) {
+      if (!current) {
+        const built = buildPersonalQuest(live, new Date(), situation);
+        built.date = today;
         live.quests.push(built);
+        current = built;
+      } else {
+        collapseToJournal(current);
       }
-      current = built;
-    } else if (!current.tasks.some((t) => t.title === JOURNAL_TASK)) {
-      // Quests built before journaling was mandatory still need the beat :
-      // and the reward has to grow with the extra work.
-      current.tasks.push({
-        id: crypto.randomUUID(),
-        title: JOURNAL_TASK,
-        completed: false,
-      });
-      current.rewardXp = 80 + current.tasks.length * 20;
-      const journalSkill = defaultSkillForCategory(current.category);
-      if (journalSkill && !current.skillIds.includes(journalSkill)) {
-        current.skillIds.push(journalSkill);
-      }
-    }
-    // Keep the reward honest for days that grew a task after being built.
-    if (current.status !== "completed") {
-      current.rewardXp = 80 + current.tasks.length * 20;
     }
     resolved = current;
   });

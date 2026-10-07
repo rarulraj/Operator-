@@ -93,6 +93,9 @@ export function Character({
   const aura = equipped.find((id) => id.startsWith("aura-"));
   const companionId = equipped.find((id) => id.startsWith("companion-"));
   const companion = companionId ? findShopItem(companionId, shopStock) : null;
+  const upgrade = equipped
+    .map((id) => findShopItem(id, shopStock))
+    .find((item) => item?.type === "upgrade");
   const backdrop = equipped.find((id) => id.startsWith("backdrop-"));
 
   const frameClass =
@@ -121,6 +124,15 @@ export function Character({
             size={Math.round(size * 0.42)}
             className="animate-sprite-idle absolute -bottom-2 -left-3 rounded-lg border border-ink-600/70 bg-[#17110c]"
           />
+        )}
+        {upgrade && (
+          <span
+            className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-lg border border-ink-600/70 bg-[#17110c] text-base leading-none"
+            aria-label={upgrade.name}
+            title={upgrade.name}
+          >
+            {upgrade.glyph ?? "⚔️"}
+          </span>
         )}
         <span className="absolute -bottom-1.5 -right-1.5 rounded-md border border-xp/40 bg-ink-900 px-1.5 py-0.5 font-pixel text-[8px] font-bold uppercase text-xp">
           {stage.stage}

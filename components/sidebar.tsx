@@ -26,7 +26,7 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/quest", label: "Daily Quest", icon: ScrollText },
+  { href: "/quest", label: "Journal", icon: ScrollText },
   { href: "/tasks", label: "Tasks", icon: ListChecks },
   { href: "/skills", label: "Skill Tree", icon: Network },
   { href: "/missions", label: "Missions", icon: Swords },

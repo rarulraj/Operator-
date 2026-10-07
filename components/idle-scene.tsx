@@ -68,6 +68,9 @@ export function IdleScene({
   const aura = equipped.find((id) => id.startsWith("aura-"));
   const companionId = equipped.find((id) => id.startsWith("companion-"));
   const companion = companionId ? findShopItem(companionId, shopStock) : null;
+  const upgrade = equipped
+    .map((id) => findShopItem(id, shopStock))
+    .find((item) => item?.type === "upgrade");
   const frameClass =
     (frame && (FRAME_STYLES[frame] ?? findShopItem(frame, shopStock)?.style)) ?? "border-black/40";
   const glowClass =
@@ -129,14 +132,24 @@ export function IdleScene({
               className="animate-sprite-idle drop-shadow-[0_6px_10px_rgba(0,0,0,0.6)]"
             />
           )}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={stage.src}
-            alt={`${name}: ${stage.stage}`}
-            width={210}
-            height={210}
-            className={`animate-sprite-idle ${glowClass} pixelated rounded-2xl border-2 ${frameClass} drop-shadow-[0_8px_14px_rgba(0,0,0,0.65)]`}
-          />
+          <div className="relative">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={stage.src}
+              alt={`${name}: ${stage.stage}`}
+              width={210}
+              height={210}
+              className={`animate-sprite-idle ${glowClass} pixelated rounded-2xl border-2 ${frameClass} drop-shadow-[0_8px_14px_rgba(0,0,0,0.65)]`}
+            />
+            {upgrade && (
+              <span
+                className="absolute -right-3 -top-3 flex h-12 w-12 items-center justify-center rounded-xl border border-black/40 bg-[#17110c] text-2xl leading-none"
+                aria-label={upgrade.name}
+              >
+                {upgrade.glyph ?? "⚔️"}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 

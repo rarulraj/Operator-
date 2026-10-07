@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   Flame,
   PartyPopper,
-  Pencil,
   Plus,
   Sparkles,
   Trash2,
@@ -41,7 +40,7 @@ export function QuestView({
   const [savingJournal, setSavingJournal] = useState(false);
   const [journalXp, setJournalXp] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [editing, setEditing] = useState(false);
+  const editing = false;
   const [newTask, setNewTask] = useState("");
 
   // Drop optimistic ticks once the server's version of the quest arrives.
@@ -156,19 +155,11 @@ export function QuestView({
         <div className="px-6 pb-6 pt-5">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
-              Today&apos;s Quest
+              Journal
             </span>
             {meta && <Badge className={meta.tailwind}>{meta.shortName}</Badge>}
             <Badge className="text-xp">+{quest.rewardXp} XP</Badge>
             {isCompleted && <Badge className="text-reef">Completed</Badge>}
-            {!isCompleted && (
-              <button
-                onClick={() => setEditing((e) => !e)}
-                className="ml-auto flex items-center gap-1.5 rounded-lg border border-ink-700 px-2.5 py-1 text-[11px] font-medium text-zinc-400 transition-colors hover:border-ink-600 hover:text-zinc-200"
-              >
-                <Pencil size={12} /> {editing ? "Done editing" : "Edit tasks"}
-              </button>
-            )}
           </div>
 
           <h1 className="mt-2 text-xl font-semibold tracking-tight text-zinc-50">
@@ -361,10 +352,10 @@ export function QuestView({
                   "Completing…"
                 ) : allDone ? (
                   <>
-                    <CheckCircle2 size={15} /> Complete Quest · +{quest.rewardXp} XP
+                    <CheckCircle2 size={15} /> Bank the day · +{quest.rewardXp} XP
                   </>
                 ) : (
-                  `Finish the real work first (${done}/${tasks.length})`
+                  "Write the journal, then bank the day"
                 )}
               </Button>
             </div>
@@ -383,7 +374,7 @@ export function QuestView({
           <div className="px-6 py-5">
             <div className="flex items-center gap-2 text-sm font-semibold text-xp">
               <PartyPopper size={16} />
-              Quest Complete: +{result.xpAwarded} XP
+              Day banked: +{result.xpAwarded} XP
               {result.streak > 0 && (
                 <span className="ml-2 inline-flex items-center gap-1 text-orange-400">
                   <Flame size={14} /> {result.streak} day streak

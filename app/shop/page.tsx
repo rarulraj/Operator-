@@ -13,8 +13,8 @@ export default async function ShopPage() {
       <div>
         <h1 className="text-xl font-semibold tracking-tight text-zinc-50">Shop</h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Pierre restocks. Gold from real work buys frames, auras, companions,
-          titles, and backdrops. When the shelf thins, another one is written.
+          Pierre restocks. Gold from real work buys upgrades, frames, auras,
+          companions, titles, and backdrops. Gear shows on the portrait.
           Style only: power still comes from XP.
         </p>
       </div>

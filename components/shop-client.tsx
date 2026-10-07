@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { Card } from "./ui";
 
 const SECTIONS: { type: ShopItemType; label: string }[] = [
+  { type: "upgrade", label: "Upgrades" },
   { type: "frame", label: "Portrait Frames" },
   { type: "aura", label: "Auras" },
   { type: "companion", label: "Companions" },
@@ -48,7 +49,7 @@ function ItemPreview({ item }: { item: ShopItem }) {
       />
     );
   }
-  if (item.type === "companion") {
+  if (item.type === "companion" || item.type === "upgrade") {
     return (
       <CompanionMark
         item={item}

@@ -7,7 +7,8 @@ export type ShopItemType =
   | "aura"
   | "companion"
   | "title"
-  | "backdrop";
+  | "backdrop"
+  | "upgrade";
 
 export interface ShopItem {
   id: string;
@@ -19,7 +20,7 @@ export interface ShopItem {
   titleText?: string;
   /** For companions: the sprite in /public. */
   sprite?: string;
-  /** For companions without a sprite: a small glyph on the portrait. */
+  /** Companion or upgrade glyph shown on the portrait. */
   glyph?: string;
   /** Tailwind / CSS classes for frames, auras, and backdrops. */
   style?: string;
@@ -659,6 +660,112 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 380,
     type: "backdrop",
     style: "bg-[#101610]",
+  },
+
+  // ── Upgrades: gear you wear. Cosmetic, one equipped at a time. ──
+  {
+    id: "upgrade-lucky-coin",
+    name: "Lucky Coin",
+    description: "A worn coin. Flip it before a hard call.",
+    cost: 90,
+    type: "upgrade",
+    glyph: "🪙",
+  },
+  {
+    id: "upgrade-field-dice",
+    name: "Field Dice",
+    description: "Two dice for when the board is a coin flip.",
+    cost: 140,
+    type: "upgrade",
+    glyph: "🎲",
+  },
+  {
+    id: "upgrade-ink-quill",
+    name: "Ink Quill",
+    description: "Writes the day down. The journal approves.",
+    cost: 160,
+    type: "upgrade",
+    glyph: "🪶",
+  },
+  {
+    id: "upgrade-rusted-key",
+    name: "Rusted Key",
+    description: "Opens the back room of the shop.",
+    cost: 180,
+    type: "upgrade",
+    glyph: "🗝️",
+  },
+  {
+    id: "upgrade-brass-compass",
+    name: "Brass Compass",
+    description: "Points at the next real move, not the inbox.",
+    cost: 240,
+    type: "upgrade",
+    glyph: "🧭",
+  },
+  {
+    id: "upgrade-lantern",
+    name: "Field Lantern",
+    description: "6am light you can carry. Shows on the portrait.",
+    cost: 280,
+    type: "upgrade",
+    glyph: "🏮",
+  },
+  {
+    id: "upgrade-bench-shield",
+    name: "Bench Shield",
+    description: "Heavy. For days you have to hold the line.",
+    cost: 340,
+    type: "upgrade",
+    glyph: "🛡️",
+  },
+  {
+    id: "upgrade-iron-anvil",
+    name: "Iron Anvil",
+    description: "The work gets shaped here. No XP bonus. Just the look.",
+    cost: 420,
+    type: "upgrade",
+    glyph: "⚒️",
+  },
+  {
+    id: "upgrade-health-potion",
+    name: "Recovery Flask",
+    description: "Red glass. Looks like a heal. It is a sticker.",
+    cost: 260,
+    type: "upgrade",
+    glyph: "🧪",
+  },
+  {
+    id: "upgrade-war-banner",
+    name: "War Banner",
+    description: "A small flag. Equip it when the week is a campaign.",
+    cost: 480,
+    type: "upgrade",
+    glyph: "🚩",
+  },
+  {
+    id: "upgrade-star-chart",
+    name: "Star Chart",
+    description: "Night navigation. Endgame trinket.",
+    cost: 560,
+    type: "upgrade",
+    glyph: "✨",
+  },
+  {
+    id: "upgrade-wyrm-tooth",
+    name: "Wyrm Tooth",
+    description: "A trophy. You did not slay anything. It still looks good.",
+    cost: 640,
+    type: "upgrade",
+    glyph: "🐉",
+  },
+  {
+    id: "upgrade-crown",
+    name: "Crown of Hours",
+    description: "Bought with gold from days you actually banked.",
+    cost: 900,
+    type: "upgrade",
+    glyph: "👑",
   },
 ];
 

@@ -156,8 +156,8 @@ function heuristicReply(state: AppState, message: string): string {
   if (/\b(quest|today)\b/.test(lower)) {
     const today = state.quests[state.quests.length - 1];
     return today
-      ? `Today's quest: "${today.title}" (${today.status}). ${today.status === "completed" ? "Done. Log anything else you shipped and bank the day." : "Finish the three tasks, write the reflection, bank it."}`
-      : "No quest yet today: open the Daily Quest page and it'll generate one.";
+      ? `Today's journal: "${today.title}" (${today.status}). ${today.status === "completed" ? "The day is banked." : "Write the journal, then bank the day."}`
+      : "No journal yet today: open Journal and write the day.";
   }
   if (/\b(how|help|what is|where|notes?|task|journal|shop|idle)\b/.test(lower)) {
     return appHelp(lower, state);
@@ -173,7 +173,7 @@ function appHelp(lower: string, state: AppState): string {
     return "Tasks is the chore board. Add a row, click the title to rename, pin to float it, sticky-note for working context. Completing a task pays a little XP. The Board brief above the list is the agent reading your open work.";
   }
   if (/quest/.test(lower)) {
-    return "Daily Quest is built from your board, missions, and the weekday. Tick the tasks, write the journal beat, then Complete Quest. That is what banks the streak.";
+    return "Journal is the recurring day. Write what moved, what stalled, and the one thing tomorrow, then bank it. That is what keeps the streak. Tasks and missions stay on their own boards.";
   }
   if (/journal|log|activit/.test(lower)) {
     return "Activity Log is the journal. Write what actually happened; the coach classifies it into skills and XP. The same journal beat sits on today's quest.";
@@ -185,7 +185,7 @@ function appHelp(lower: string, state: AppState): string {
     return "Missions are the long goals. Assign tasks to a mission from the board. Completing those tasks nudges progress; only you can mark a mission done.";
   }
   if (/shop|gold/.test(lower)) {
-    return `Shop is cosmetics only. You have ${state.inventory.gold} gold. Tasks, quests, and missions pay gold. Equip from the shop; it changes the character, not the XP.`;
+    return `Shop is cosmetics only. You have ${state.inventory.gold} gold. Tasks, the journal, and missions pay gold. Upgrades are gear that shows on the portrait. Equip from the shop; it changes the character, not the XP.`;
   }
   return "I can see your board, quest, missions, notes, journal, and remembered context. Ask what to do today, how a page works, or dump a situation. Full chat lives under AI Chat if you want a longer thread. Add an OpenAI key in Settings for sharper answers.";
 }
@@ -195,7 +195,7 @@ You are the always-on Helper inside Operator, a small panel Arun can open from a
 You have his full live state: tasks and their notes, daily quest, missions, journal, scratchpad notes, shop gold, skills, and remembered facts.
 You also know the product:
 - Dashboard: quest + board + coach
-- Daily Quest: today's three beats + journal
+- Journal: the recurring daily write. Banking it keeps the streak
 - Tasks: chore board (rename, pin, per-task notes, board brief)
 - Notes: scratchpad; checklist icon makes a task
 - Activity Log: journal that awards XP
